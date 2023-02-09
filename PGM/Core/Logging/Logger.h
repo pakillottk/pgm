@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string_view>
 
 #if PGM_LOGGING_LEVEL > 0
@@ -6,7 +8,7 @@
 #include <utility>
 #endif
 
-namespace PGM { namespace Logging {
+namespace PGM::Logging {
 
 template<typename... Rest>
 inline void
@@ -20,4 +22,4 @@ log_error([[maybe_unused]] const std::string_view& str,
 #endif
 }
 
-}}
+}

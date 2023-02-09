@@ -1,6 +1,6 @@
 #include <Windows.h>
 
-#include <renderer/platform/window/Window.h>
+#include <PGM/Renderer/Platform/Window/Window.h>
 
 int CALLBACK WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance,
                      [[maybe_unused]] LPSTR lpCmdLine, [[maybe_unused]] int nShowCmd)

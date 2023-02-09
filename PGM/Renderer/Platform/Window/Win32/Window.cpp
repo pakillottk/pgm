@@ -1,7 +1,8 @@
 #include "../Window.h"
-#include "../../../logging/Logger.h"
-#include "../../strings/Strings.h"
+#include "../../Strings/Strings.h"
 
+#include <PGM/Core/Assert/Assert.h>
+#include <PGM/Core/Logging/Logger.h>
 #include <cassert>
 #include <stdexcept>
 #include <tuple>
@@ -96,7 +97,7 @@ Window::~Window() = default;
 
 void Window::run() const
 {
-    assert(m_Impl && m_Impl->ctx.window_handle);
+    PGM_ASSERT(m_Impl && m_Impl->ctx.window_handle, "Invalid window context");
 
     ShowWindow(m_Impl->ctx.window_handle, 1);
 

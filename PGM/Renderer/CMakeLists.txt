@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.14)
-project(pgm_renderer)
+project(renderer)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -29,12 +29,19 @@ set(
 if (WIN32)
   set(
     PLATFORM_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/window/win32/Window.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/strings/win32/Strings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Window/Win32/Window.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Strings/Win32/Strings.cpp
   )
 endif()
 
-add_library(pgm_renderer ${PLATFORM_SOURCES} ${SOURCES})
-target_link_libraries(pgm_renderer PUBLIC glm::glm EnTT::EnTT fmt::fmt)
-target_compile_definitions(pgm_renderer PRIVATE PGM_LOGGING_LEVEL=3)
-target_compile_options(pgm_renderer PRIVATE "-Wall")
+add_library(${PROJECT_NAME} ${PLATFORM_SOURCES} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} PUBLIC pgm::core glm::glm EnTT::EnTT fmt::fmt)
+
+if(MSVC)
+  set(WARN_LEVEL "-W4")
+else()
+  set(WARN_LEVEL "-Wall -Wextra -Wpedantic")
+endif()
+target_compile_options(${PROJECT_NAME} PRIVATE ${WARN_LEVEL})
+
+add_library(pgm::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
