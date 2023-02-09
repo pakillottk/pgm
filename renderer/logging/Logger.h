@@ -1,23 +1,23 @@
+#include <string_view>
+
 #if PGM_LOGGING_LEVEL > 0
-#include <iostream>
+#include <fmt/color.h>
+#include <fmt/format.h>
 #include <utility>
 #endif
 
 namespace PGM { namespace Logging {
 
-    void log_error([[maybe_unused]] const auto& data)
-    {
-        #if PGM_LOGGING_LEVEL > 0
-        std::cout << data << '\n';
-        #endif
-    }
-
-    void log_error([[maybe_unused]] const auto& data, [[maybe_unused]] auto&&... rest)
-    {
-        #if PGM_LOGGING_LEVEL > 0
-        std::cout << data;
-        log_error(std::forward<decltype(rest)>(rest)...);
-        #endif
-    }
+template<typename... Rest>
+inline void
+log_error([[maybe_unused]] const std::string_view& str,
+          [[maybe_unused]] Rest&&... rest)
+{
+#if PGM_LOGGING_LEVEL > 0
+  fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red),
+             "[ERROR] {}\n",
+             fmt::format(str, std::forward<Rest>(rest)...));
+#endif
+}
 
 }}

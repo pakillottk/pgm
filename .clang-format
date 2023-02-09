@@ -1,0 +1,9 @@
+﻿---
+BasedOnStyle: Microsoft
+BreakBeforeBraces: Custom
+CompactNamespaces: 'true'
+IncludeBlocks: Preserve
+NamespaceIndentation: Inner
+PointerAlignment: Right
+
+...
