@@ -12,7 +12,7 @@ if (WIN32)
   add_compile_definitions(UNICODE)
 endif()
 
-# find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 # find_package(GLUT REQUIRED)
 # include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
@@ -22,20 +22,28 @@ endif()
 # platform agnostic
 set(
     SOURCES 
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/OpenGlCommands.cpp
 )
 
 # platform specific
 if (WIN32)
   set(
     PLATFORM_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Window/Win32/Window.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Strings/Win32/Strings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Win32/OpenGlRenderContext.cpp
   )
 endif()
 
 add_library(${PROJECT_NAME} ${PLATFORM_SOURCES} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} PUBLIC pgm::core glm::glm EnTT::EnTT fmt::fmt)
+target_link_libraries(
+  ${PROJECT_NAME} 
+  
+  PUBLIC 
+    pgm::core 
+    pgm::platform
+
+  PRIVATE
+    ${OPENGL_LIBRARIES}
+)
 
 if(MSVC)
   set(WARN_LEVEL "-W4")

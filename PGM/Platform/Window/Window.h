@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <PGM/Core/Ref/Ref.h>
 #include <string_view>
 
 namespace PGM::Platform
@@ -22,17 +22,21 @@ class Window
     Window(const std::string_view &title, unsigned w = 800, unsigned h = 600, FLAGS flags = bDefault);
     ~Window();
 
+    void show() const;
+
     /**
      * Runs the window's main loop
      */
-    void run() const;
+    bool pumpMessages() const;
 
     Window(const Window &) = delete;
     Window &operator=(const Window &) = delete;
 
-  private:
     struct window_impl_t;
-    std::unique_ptr<window_impl_t> m_Impl;
+    const window_impl_t &impl() const;
+
+  private:
+    Ref<window_impl_t> m_Impl;
 };
 
 } // namespace PGM::Platform

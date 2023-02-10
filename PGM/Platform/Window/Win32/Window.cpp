@@ -1,5 +1,6 @@
 #include "../Window.h"
 #include "../../Strings/Strings.h"
+#include "WindowImpl.h"
 
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Logging/Logger.h>
@@ -33,28 +34,12 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
     return Result;
 }
 
-struct window_context_t
-{
-    WNDCLASSW wc;
-    HWND window_handle;
-    HDC hdc;
-};
-
-struct PGM::Platform::Window::window_impl_t
-{
-    window_context_t ctx;
-
-    inline window_impl_t(window_context_t _ctx) : ctx{std::move(_ctx)}
-    {
-    }
-};
-
-internal window_context_t win32_create_window(const std::string_view &title, unsigned w, unsigned h,
-                                              Window::FLAGS flags)
+internal Window::window_impl_t win32_create_window(const std::string_view &title, unsigned w, unsigned h,
+                                                   Window::FLAGS flags)
 {
     HINSTANCE hInstance = GetModuleHandleW(NULL);
 
-    window_context_t context{};
+    Window::window_impl_t context{};
 
     context.wc = {};
     context.wc.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
@@ -95,26 +80,35 @@ Window::Window(const std::string_view &title, unsigned w /*= 800*/, unsigned h /
 
 Window::~Window() = default;
 
-void Window::run() const
+const Window::window_impl_t &Window::impl() const
 {
-    PGM_ASSERT(m_Impl && m_Impl->ctx.window_handle, "Invalid window context");
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+    return *m_Impl;
+}
 
-    ShowWindow(m_Impl->ctx.window_handle, 1);
+void Window::show() const
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+    ShowWindow(m_Impl->window_handle, 1);
+}
 
-    for (;;)
+bool Window::pumpMessages() const
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+
+    MSG Message;
+    BOOL MessageResult = GetMessage(&Message, m_Impl->window_handle, 0, 0);
+    if (MessageResult > 0)
     {
-        MSG Message;
-        BOOL MessageResult = GetMessage(&Message, m_Impl->ctx.window_handle, 0, 0);
-        if (MessageResult > 0)
-        {
-            TranslateMessage(&Message);
-            DispatchMessage(&Message);
-        }
-        else
-        {
-            break;
-        }
+        TranslateMessage(&Message);
+        DispatchMessage(&Message);
     }
+    else
+    {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace PGM::Platform

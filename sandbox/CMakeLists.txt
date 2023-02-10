@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.14)
 project(pgm_sandbox)
 
-set (CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # add_compile_options(-fsanitize=address)
@@ -11,9 +11,6 @@ if (WIN32)
   # Non unicode windows api is broken...
   add_compile_definitions(UNICODE)
 endif()
-
-include_directories(${PGM_RENDERER_INCLUDE_DIRS})
-
 
 if (WIN32)
     set(SOURCES 
@@ -26,7 +23,7 @@ else()
     )
     add_executable(pgm_sandbox ${SOURCES})
 endif()
-target_link_libraries(pgm_sandbox PRIVATE pgm::renderer)
+target_link_libraries(pgm_sandbox PRIVATE pgm::core pgm::platform pgm::renderer)
 
 if(MSVC)
   set(WARN_LEVEL "-W4")
