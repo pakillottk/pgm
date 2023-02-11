@@ -39,7 +39,10 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         UINT height = HIWORD(lParam);
         dispatcher->emplace_dispatch<WindowEvents::WindowResizedEvent>(static_cast<int>(width),
                                                                        static_cast<int>(height));
+        Result = DefWindowProcW(window, message, wParam, lParam);
     }
+    break;
+
     default:
         Result = DefWindowProcW(window, message, wParam, lParam);
         break;
