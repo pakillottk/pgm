@@ -7,6 +7,7 @@
 // On windows this header is required for certain types and macros...
 #include <Windows.h>
 #endif
+#include <GL/glew.h>
 #include <gl/GL.h>
 
 #include <string>
@@ -42,7 +43,9 @@ internal inline GLenum glCheckError(const char *file, int line)
         case GL_OUT_OF_MEMORY:
             error = "OUT_OF_MEMORY";
             break;
-            // case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            error = "INVALID_FRAMEBUFFER_OPERATION";
+            break;
         }
         Logging::log_error("(OpenGL) Error: {}\tSource: {}:{}", error, file, line);
     }

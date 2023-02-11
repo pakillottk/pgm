@@ -50,7 +50,7 @@ class Window
 
   private:
     Ref<window_impl_t> m_Impl;
-    Events::EventDispatcher m_Dispatcher;
+    Events::EventQueue m_Dispatcher;
 };
 
 } // namespace PGM::Platform

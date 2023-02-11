@@ -20,7 +20,7 @@ using listener_id = size_t;
 
 class EventDispatcher;
 
-struct EventListener
+struct EventListener final
 {
     inline ~EventListener()
     {
@@ -79,6 +79,7 @@ class EventDispatcher
         queue.erase(id);
     }
 
+  protected:
     template <typename EventType> inline void dispatch(const EventType &event) const
     {
         std::scoped_lock<std::mutex> lk{m_Lock};
@@ -98,11 +99,6 @@ class EventDispatcher
                       [&event](const auto &listener) { listener.second(reinterpret_cast<const void *>(&event)); });
     }
 
-    template <typename EventType, typename... Args> inline void emplace_dispatch(Args &&...args)
-    {
-        dispatch<EventType>(EventType{std::forward<Args>(args)...});
-    }
-
   private:
     static std::atomic<listener_id> g_LastListenerId;
     static inline listener_id genId()
@@ -112,6 +108,20 @@ class EventDispatcher
 
     mutable std::mutex m_Lock;
     EventDispatchTable m_Listeners;
+};
+
+class EventQueue final : public EventDispatcher
+{
+  public:
+    template <typename EventType> inline void dispatch(const EventType &event) const
+    {
+        EventDispatcher::dispatch<EventType>(event);
+    }
+
+    template <typename EventType, typename... Args> inline void emplace_dispatch(Args &&...args)
+    {
+        EventDispatcher::dispatch<EventType>(EventType{std::forward<Args>(args)...});
+    }
 };
 
 } // namespace PGM::Events

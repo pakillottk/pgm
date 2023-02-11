@@ -30,8 +30,8 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     break;
 
     case WM_SIZE: {
-        Events::EventDispatcher *dispatcher =
-            reinterpret_cast<Events::EventDispatcher *>(GetWindowLongPtr(window, GWLP_USERDATA));
+        Events::EventQueue *dispatcher =
+            reinterpret_cast<Events::EventQueue *>(GetWindowLongPtr(window, GWLP_USERDATA));
         PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
 
         // Resized

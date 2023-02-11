@@ -3,7 +3,7 @@
 namespace PGM::Platform::WindowEvents
 {
 
-struct WindowResizedEvent
+struct WindowResizedEvent final
 {
     int width;
     int height;
