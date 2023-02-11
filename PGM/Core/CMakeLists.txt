@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.14)
 project(core)
 
+option (BUILD_SHARED_LIBS OFF)
+
 set (PGM_LOGGING_LEVEL 3)
 set (PGM_ASSERTS_ENABLED 
     $<$<CONFIG:DEBUG>: "PGM_ASSERTS_ENABLED" > 
@@ -34,7 +36,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PGM_ASSERTS_ENABLED} PGM_LOG
 if(MSVC)
   set(WARN_LEVEL "-W4")
 else()
-  set(WARN_LEVEL "-Wall -Wextra -Wpedantic")
+  set(WARN_LEVEL "-Wall" "-Wextra" "-Wpedantic")
 endif()
 target_compile_options(${PROJECT_NAME} PRIVATE ${WARN_LEVEL})
 

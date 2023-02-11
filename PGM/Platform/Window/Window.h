@@ -1,5 +1,6 @@
 #pragma once
 
+#include <PGM/Core/Rect/Rect.h>
 #include <PGM/Core/Ref/Ref.h>
 #include <string_view>
 
@@ -22,6 +23,12 @@ class Window
     Window(const std::string_view &title, unsigned w = 800, unsigned h = 600, FLAGS flags = bDefault);
     ~Window();
 
+    /// @brief Bottom left corner (as most graphics API coord system)
+    /// @return
+    RectInt rect() const;
+    int width() const;
+    int height() const;
+
     void show() const;
 
     /**
@@ -31,7 +38,6 @@ class Window
 
     Window(const Window &) = delete;
     Window &operator=(const Window &) = delete;
-
     struct window_impl_t;
     const window_impl_t &impl() const;
 

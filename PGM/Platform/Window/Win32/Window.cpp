@@ -86,6 +86,49 @@ const Window::window_impl_t &Window::impl() const
     return *m_Impl;
 }
 
+RectInt Window::rect() const
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+
+    RECT rect;
+#ifdef PGM_ASSERTS_ENABLED
+    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+#else
+    GetWindowRect(m_Impl->window_handle, &rect)
+#endif
+
+    return RectInt{static_cast<int>(rect.left), static_cast<int>(rect.bottom), static_cast<int>(rect.right - rect.left),
+                   static_cast<int>(rect.bottom - rect.top)};
+}
+
+int Window::width() const
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+
+    RECT rect;
+#ifdef PGM_ASSERTS_ENABLED
+    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+#else
+    GetWindowRect(m_Impl->window_handle, &rect)
+#endif
+
+    return static_cast<int>(rect.right - rect.left);
+}
+
+int Window::height() const
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+
+    RECT rect;
+#ifdef PGM_ASSERTS_ENABLED
+    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+#else
+    GetWindowRect(m_Impl->window_handle, &rect)
+#endif
+
+    return static_cast<int>(rect.bottom - rect.top);
+}
+
 void Window::show() const
 {
     PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");

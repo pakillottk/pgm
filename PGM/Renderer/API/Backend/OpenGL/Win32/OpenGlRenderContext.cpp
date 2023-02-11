@@ -4,7 +4,10 @@
 #include <PGM/Core/Logging/Logger.h>
 #include <PGM/Platform/Window/Win32/WindowImpl.h>
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
 #include <gl/GL.h>
+
 #include <stdexcept>
 
 #define internal static
@@ -23,15 +26,25 @@ internal void logOpenGlInfo()
     const char *glVersion = reinterpret_cast<const char *>(glGetString(GL_VERSION));
     const char *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
     const char *renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+    const char *shading = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     Logging::log_info("Created OpenGL context");
-    Logging::log_info("GL Version: {}", glVersion);
-    Logging::log_info("GL Vendor: {}", vendor);
-    Logging::log_info("GL Renderer: {}", renderer);
+    Logging::log_info("GL Version:\t{}", glVersion);
+    Logging::log_info("GL Vendor:\t{}", vendor);
+    Logging::log_info("GL Renderer:\t{}", renderer);
+    Logging::log_info("GL Shading Language:\t{}", shading);
 #endif
 }
 
-internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor)
+internal inline void configureOpenGlContext()
+{
+    glFrontFace(GL_CCW);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+}
+
+internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlContextFlagCreationMask flags)
 {
     PIXELFORMATDESCRIPTOR pfd = {sizeof(PIXELFORMATDESCRIPTOR),
                                  1,
@@ -71,34 +84,57 @@ internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor)
         return nullptr;
     }
 
-    // GLint attribs[] = {WGL_CONTEXT_MAJOR_VERSION_ARB, desiredMajor, WGL_CONTEXT_MINOR_VERSION_ARB, desiredMinor,
-    //                    // TODO(pgm) For now, compatibility mode...
-    //                    // Forward compatibility mode
-    //                    // WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-    //                    // Compatibility profile
-    //                    // WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-    //                    0};
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
+    {
+        wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(dummyContext);
+        Logging::log_error("Failed to initialize GLEW");
+        return nullptr;
+    }
 
-    // auto context = wglCreateContextAttribsARB(dc, 0, attribs);
-    // wglMakeCurrent(nullptr, nullptr);
-    // wglDeleteContext(dummyContext);
-    // if (context == nullptr || !wglMakeCurrent(dc, context))
-    // {
-    //     Logging::log_error("Fatal error! The opengl context creation failed...");
-    //     return nullptr;
-    // }
+    GLint attribs[] = {WGL_CONTEXT_MAJOR_VERSION_ARB, desiredMajor, WGL_CONTEXT_MINOR_VERSION_ARB, desiredMinor,
+                       // TODO(pgm) For now, compatibility mode...
+                       // Forward compatibility mode
+                       //                        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+                       // Compatibility profile
+                       WGL_CONTEXT_PROFILE_MASK_ARB,
+                       (flags & bOglContextCompatibiltyMode) > 0 ? WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+                                                                 : WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+#ifdef _DEBUG
+                       // ask for debug context for non "Release" builds
+                       WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+#endif
+                       0};
+
+    auto context = wglCreateContextAttribsARB(dc, 0, attribs);
+    wglMakeCurrent(nullptr, nullptr);
+    wglDeleteContext(dummyContext);
+    if (context == nullptr || !wglMakeCurrent(dc, context))
+    {
+        Logging::log_error("Fatal error! The opengl context creation failed...");
+        return nullptr;
+    }
 
     logOpenGlInfo();
 
-    return dummyContext;
+    configureOpenGlContext();
+
+    return context;
 }
 
-OpenGlRenderContext::OpenGlRenderContext(SharedRef<Platform::Window> window, int majorVersion /*= 4*/,
-                                         int minorVersion /*= 6*/)
+OpenGlRenderContext::OpenGlRenderContext(SharedRef<Platform::Window> window,
+                                         OpenGlContextFlagCreationMask flags /*= OPENGL_DEFAULT_CONTEXT_FLAGS*/,
+                                         int majorVersion /*= 4*/, int minorVersion /*= 6*/)
     : m_Window{window}, m_Context{nullptr, [](OpenGlRenderContext::context_t *) {}}
 {
+    if (majorVersion < 3 || (majorVersion == 3 && minorVersion < 3))
+    {
+        throw std::runtime_error{"An OpenGL core-profile capable version is required (3.3+)"};
+    }
+
     // TODO(pgm) Set the desired GL Version
-    auto context = createContext(m_Window->impl().hdc, majorVersion, minorVersion);
+    auto context = createContext(m_Window->impl().hdc, majorVersion, minorVersion, flags);
     if (context == nullptr)
     {
         throw std::runtime_error{"Cant create the OpenGL context..."};

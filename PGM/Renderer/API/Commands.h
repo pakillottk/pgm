@@ -1,6 +1,7 @@
 #pragma once
 
 #include <PGM/Core/Color/Color.h>
+#include <PGM/Core/Rect/Rect.h>
 
 namespace PGM::Renderer::API
 {
@@ -17,6 +18,7 @@ using ClearBufferMask = int;
 struct Commands
 {
     virtual void clear(ClearBufferMask mask, Color clearColor = Colors::Black) const = 0;
+    virtual void setViewport(const RectInt &viewportRect) const = 0;
 };
 
 } // namespace PGM::Renderer::API

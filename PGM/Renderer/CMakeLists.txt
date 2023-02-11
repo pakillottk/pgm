@@ -4,6 +4,8 @@ project(renderer)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+option (BUILD_SHARED_LIBS OFF)
+
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 
@@ -43,13 +45,15 @@ target_link_libraries(
 
   PRIVATE
     ${OPENGL_LIBRARIES}
+    glew_s
 )
 
 if(MSVC)
   set(WARN_LEVEL "-W4")
 else()
-  set(WARN_LEVEL "-Wall -Wextra -Wpedantic")
+  set(WARN_LEVEL "-Wall" "-Wextra" "-Wpedantic")
 endif()
 target_compile_options(${PROJECT_NAME} PRIVATE ${WARN_LEVEL})
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLEW_INCLUDE_DIRS})
 
 add_library(pgm::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

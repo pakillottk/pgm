@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.14)
 project(platform)
 
+option (BUILD_SHARED_LIBS OFF)
+
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
@@ -40,7 +42,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC pgm::core)
 if(MSVC)
   set(WARN_LEVEL "-W4")
 else()
-  set(WARN_LEVEL "-Wall -Wextra -Wpedantic")
+  set(WARN_LEVEL "-Wall" "-Wextra" "-Wpedantic")
 endif()
 target_compile_options(${PROJECT_NAME} PRIVATE ${WARN_LEVEL})
 

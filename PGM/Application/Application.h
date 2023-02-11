@@ -38,7 +38,14 @@ class Application
     template <typename RenderContextBackend, typename... Args> inline void setContext(Args &&...args)
     {
         std::scoped_lock<std::mutex> lk{m_RendererMutex};
-        m_RenderContext = createContext(m_Window, std::forward<Args>(args)...);
+        m_RenderContext = createContext<RenderContextBackend>(m_Window, std::forward<Args>(args)...);
+    }
+
+    /// @brief Swaps the render context. Can be done while running
+    template <typename RenderContextBackend> inline void setContext()
+    {
+        std::scoped_lock<std::mutex> lk{m_RendererMutex};
+        m_RenderContext = createContext<RenderContextBackend>(m_Window);
     }
 
     const Renderer::RenderContext &context() const
