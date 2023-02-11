@@ -1,24 +1,30 @@
-#include "Commands.h"
+#pragma once
+
+#include "API/Commands.h"
 
 #include <PGM/Core/Ref/Ref.h>
 #include <PGM/Platform/Window/Window.h>
 
 #include <memory>
 
-namespace PGM::Renderer::API
+namespace PGM::Renderer
 {
+
 class RenderContext
 {
   public:
     template <typename RenderContextBackend>
-    RenderContext(RenderContextBackend backend)
+    explicit RenderContext(RenderContextBackend backend)
         : m_Context{std::make_unique<graphics_context_model_t<RenderContextBackend>>(std::move(backend))}
     {
     }
 
-    inline void bind() const
+    RenderContext(RenderContext &&) = default;
+    RenderContext &operator=(RenderContext &&) = default;
+
+    inline bool bind() const
     {
-        m_Context->bind();
+        return m_Context->bind();
     }
 
     inline void unbind() const
@@ -31,12 +37,12 @@ class RenderContext
         m_Context->swapBuffers();
     }
 
-    inline const Commands *commands() const
+    inline const API::Commands *commands() const
     {
         return m_Context->commands();
     }
 
-    inline const Commands *operator->() const
+    inline const API::Commands *operator->() const
     {
         return commands();
     }
@@ -51,10 +57,10 @@ class RenderContext
     {
         virtual ~graphics_context_concept_t() = default;
 
-        virtual void bind() const = 0;
+        virtual bool bind() const = 0;
         virtual void unbind() const = 0;
         virtual void swapBuffers() const = 0;
-        virtual const Commands *commands() const = 0;
+        virtual const API::Commands *commands() const = 0;
 
         virtual SharedRef<Platform::Window> window() const = 0;
     };
@@ -65,9 +71,9 @@ class RenderContext
         {
         }
 
-        inline void bind() const override
+        inline bool bind() const override
         {
-            backend.bind();
+            return backend.bind();
         }
 
         inline void unbind() const override
@@ -75,7 +81,7 @@ class RenderContext
             backend.unbind();
         }
 
-        virtual const Commands *commands() const override
+        virtual const API::Commands *commands() const override
         {
             return backend.commands();
         }
@@ -96,4 +102,4 @@ class RenderContext
     Ref<graphics_context_concept_t> m_Context;
 };
 
-} // namespace PGM::Renderer::API
+} // namespace PGM::Renderer

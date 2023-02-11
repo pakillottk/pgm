@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.14)
-project(pgm_sandbox)
+project(application)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -12,25 +12,30 @@ if (WIN32)
   add_compile_definitions(UNICODE)
 endif()
 
+# platform agnostic
+set(
+    SOURCES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Application.cpp
+)
+
+# platform specific
 if (WIN32)
-    set(SOURCES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/win32_main.cpp
-    )
-    # add_executable(pgm_sandbox WIN32 ${SOURCES})
-    add_executable(pgm_sandbox ${SOURCES})
-else()
-    set(SOURCES 
-        
-    )
-    add_executable(pgm_sandbox ${SOURCES})
+  set(
+    PLATFORM_SOURCES
+  )
 endif()
+
+add_library(${PROJECT_NAME} ${PLATFORM_SOURCES} ${SOURCES})
 target_link_libraries(
-  pgm_sandbox 
-  PRIVATE 
+  ${PROJECT_NAME} 
+  
+  PUBLIC 
     pgm::core 
-    pgm::platform 
+    pgm::platform
     pgm::renderer
-    pgm::application
+
+  PRIVATE
+    ${OPENGL_LIBRARIES}
 )
 
 if(MSVC)
@@ -39,3 +44,5 @@ else()
   set(WARN_LEVEL "-Wall -Wextra -Wpedantic")
 endif()
 target_compile_options(${PROJECT_NAME} PRIVATE ${WARN_LEVEL})
+
+add_library(pgm::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

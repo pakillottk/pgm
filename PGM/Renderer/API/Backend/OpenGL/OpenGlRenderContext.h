@@ -18,7 +18,7 @@ class OpenGlRenderContext
     OpenGlRenderContext(OpenGlRenderContext &&) noexcept;
     OpenGlRenderContext &operator=(OpenGlRenderContext &&) noexcept;
 
-    void bind() const;
+    bool bind() const;
     void unbind() const;
     void swapBuffers() const;
 

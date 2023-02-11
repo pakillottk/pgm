@@ -8,13 +8,21 @@ namespace PGM::Assert::detail
 
 inline void assert_impl(const char *expr_str, const char *file, int line)
 {
-    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "Assert failed:\t{}\n", expr_str);
-    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "Source:\t\tFile: {}, Line: {}\n\n", file, line);
+    fmt::print("\n");
+    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "Assert failed!\n");
+    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "--------------\n");
+    fmt::print(fmt::fg(fmt::color::red), "Check:\t{}\n", expr_str);
+    fmt::print(fmt::fg(fmt::color::red), "Source:\t{}:{}\n", file, line);
+}
+
+inline void assert_msg_begin()
+{
+    fmt::print(fmt::fg(fmt::color::red), "Detail:\t");
 }
 
 template <typename Arg, typename... Args> inline void assert_msg_impl(Arg &&arg, Args &&...args)
 {
-    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", std::forward<Arg>(arg));
+    fmt::print(fmt::fg(fmt::color::red), "{}", std::forward<Arg>(arg));
     assert_msg_impl(std::forward<Args>(args)...);
 }
 
@@ -41,6 +49,7 @@ inline void assert_msg_impl()
     if (!(Expr))                                                                                                       \
     {                                                                                                                  \
         ::PGM::Assert::detail::assert_impl(#Expr, __FILE__, __LINE__);                                                 \
+        ::PGM::Assert::detail::assert_msg_begin();                                                                     \
         ::PGM::Assert::detail::assert_msg_impl(__VA_ARGS__);                                                           \
         PGM_DBG_BRK();                                                                                                 \
     }
