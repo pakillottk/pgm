@@ -2,6 +2,7 @@
 .vscode/
 build/
 
+!vendor/glew/build
 vendor/glew/bin
 vendor/glew/lib
 vendor/glew/tmp
