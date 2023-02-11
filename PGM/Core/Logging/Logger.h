@@ -38,4 +38,13 @@ inline void log_info([[maybe_unused]] const std::string_view &str, [[maybe_unuse
 #endif
 }
 
+template <typename... Rest>
+inline void log_debug([[maybe_unused]] const std::string_view &str, [[maybe_unused]] Rest &&...rest)
+{
+#if PGM_LOGGING_LEVEL > 3
+    fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::magenta), "[DEBUG] {}\n",
+               fmt::format(str, std::forward<Rest>(rest)...));
+#endif
+}
+
 } // namespace PGM::Logging

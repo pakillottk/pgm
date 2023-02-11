@@ -1,5 +1,6 @@
 #include "Application.h"
 
+#include <PGM/Core/Logging/Logger.h>
 #include <PGM/Renderer/API/Backends.h>
 
 namespace PGM
@@ -23,6 +24,17 @@ void Application::run()
         m_RenderContext.swapBuffers();
         m_RenderContext.unbind();
     }
+}
+
+void Application::onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent)
+{
+    Logging::log_info("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
+}
+
+void Application::bindEvents()
+{
+    m_EventListeners.push_back(m_Window->dispatcher().suscribe<Platform::WindowEvents::WindowResizedEvent>(
+        [this](const auto &event) { this->onWindowResized(event); }));
 }
 
 } // namespace PGM

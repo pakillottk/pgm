@@ -3,10 +3,9 @@ project(core)
 
 option (BUILD_SHARED_LIBS OFF)
 
-set (PGM_LOGGING_LEVEL 3)
+set (PGM_LOGGING_LEVEL 4)
 set (PGM_ASSERTS_ENABLED 
-    $<$<CONFIG:DEBUG>: "PGM_ASSERTS_ENABLED" > 
-    $<$<CONFIG:RELEASE>: "" >)
+    $<$<CONFIG:DEBUG>: "PGM_ASSERTS_ENABLED" >)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -19,7 +18,7 @@ endif()
 # platform agnostic
 set(
   SOURCES 
-  Core/Core.cpp
+  Events/EventDispatcher.cpp
 )
 
 # platform specific

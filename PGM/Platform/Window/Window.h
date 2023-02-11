@@ -1,7 +1,9 @@
 #pragma once
 
+#include <PGM/Core/Events/EventDispatcher.h>
 #include <PGM/Core/Rect/Rect.h>
 #include <PGM/Core/Ref/Ref.h>
+
 #include <string_view>
 
 namespace PGM::Platform
@@ -31,6 +33,11 @@ class Window
 
     void show() const;
 
+    inline Events::EventDispatcher &dispatcher()
+    {
+        return m_Dispatcher;
+    }
+
     /**
      * Runs the window's main loop
      */
@@ -43,6 +50,7 @@ class Window
 
   private:
     Ref<window_impl_t> m_Impl;
+    Events::EventDispatcher m_Dispatcher;
 };
 
 } // namespace PGM::Platform

@@ -1,5 +1,6 @@
 #include "../Window.h"
 #include "../../Strings/Strings.h"
+#include "../Events/WindowEvents.h"
 #include "WindowImpl.h"
 
 #include <PGM/Core/Assert/Assert.h>
@@ -15,19 +16,32 @@
 namespace PGM::Platform
 {
 
-LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
+LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    // Logging::log_debug("(Win32) WindowProc: Message={}", message);
+
     LRESULT Result = 0;
 
-    switch (Message)
+    switch (message)
     {
     case WM_DESTROY: {
         PostQuitMessage(0);
     }
     break;
 
+    case WM_SIZE: {
+        Events::EventDispatcher *dispatcher =
+            reinterpret_cast<Events::EventDispatcher *>(GetWindowLongPtr(window, GWLP_USERDATA));
+        PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
+
+        // Resized
+        UINT width = LOWORD(lParam);
+        UINT height = HIWORD(lParam);
+        dispatcher->emplace_dispatch<WindowEvents::WindowResizedEvent>(static_cast<int>(width),
+                                                                       static_cast<int>(height));
+    }
     default:
-        Result = DefWindowProcW(Window, Message, WParam, LParam);
+        Result = DefWindowProcW(window, message, wParam, lParam);
         break;
     }
 
@@ -74,6 +88,9 @@ Window::Window(const std::string_view &title, unsigned w /*= 800*/, unsigned h /
     {
         throw std::runtime_error{"Cant create the window..."};
     }
+
+    Logging::log_info("{}", "(Win32) Window handle created");
+    SetWindowLongPtr(ctx.window_handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&m_Dispatcher));
 
     m_Impl = std::make_unique<window_impl_t>(std::move(ctx));
 }

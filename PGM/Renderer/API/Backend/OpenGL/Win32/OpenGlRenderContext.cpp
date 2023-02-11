@@ -28,11 +28,10 @@ internal void logOpenGlInfo()
     const char *renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
     const char *shading = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    Logging::log_info("Created OpenGL context");
-    Logging::log_info("GL Version:\t{}", glVersion);
-    Logging::log_info("GL Vendor:\t{}", vendor);
-    Logging::log_info("GL Renderer:\t{}", renderer);
-    Logging::log_info("GL Shading Language:\t{}", shading);
+    Logging::log_info("(OpenGL) GL Version:\t{}", glVersion);
+    Logging::log_info("(OpenGL) GL Vendor:\t{}", vendor);
+    Logging::log_info("(OpenGL) GL Renderer:\t{}", renderer);
+    Logging::log_info("(OpenGL) GL Shading Language:\t{}", shading);
 #endif
 }
 
