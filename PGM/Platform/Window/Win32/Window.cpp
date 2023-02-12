@@ -16,6 +16,30 @@
 namespace PGM::Platform
 {
 
+static inline Input::Key vkeyToPgmKey(WPARAM wParam, LPARAM lParam)
+{
+    auto key = wParam;
+    switch (key)
+    {
+    // Check the scancode to distinguish between left and right shift
+    case VK_SHIFT: {
+        static UINT lShift = MapVirtualKeyW(VK_LSHIFT, MAPVK_VK_TO_VSC);
+        UINT scancode = static_cast<UINT>((lParam & (0xFF << 16)) >> 16);
+        key = scancode == lShift ? Input::LShift : Input::RShift;
+    }
+
+    // Check the "extended" flag to distinguish between left and right alt
+    case VK_MENU:
+        key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RAlt : Input::LAlt;
+
+    // Check the "extended" flag to distinguish between left and right control
+    case VK_CONTROL:
+        key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RControl : Input::LControl;
+    }
+
+    return Input::detail::convertFromPlatformKey(static_cast<int>(key));
+}
+
 LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     Events::EventQueue *dispatcher = reinterpret_cast<Events::EventQueue *>(GetWindowLongPtr(window, GWLP_USERDATA));
@@ -41,12 +65,51 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
 
+    case WM_LBUTTONDOWN: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseLeft, false);
+    }
+    break;
+    case WM_LBUTTONDBLCLK: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseLeft, true);
+    }
+    break;
+    case WM_LBUTTONUP: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseLeft);
+    }
+    break;
+
+    case WM_MBUTTONDOWN: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseMiddle, false);
+    }
+    break;
+    case WM_MBUTTONDBLCLK: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseMiddle, true);
+    }
+    break;
+    case WM_MBUTTONUP: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseMiddle);
+    }
+    break;
+
+    case WM_RBUTTONDOWN: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseRight, false);
+    }
+    break;
+    case WM_RBUTTONDBLCLK: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseRight, true);
+    }
+    break;
+    case WM_RBUTTONUP: {
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseRight);
+    }
+    break;
+
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN: {
         PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
 
-        const auto key = wParam;
-        dispatcher->emplace_dispatch<WindowEvents::WindowKeyDown>(Input::detail::convertFromPlatformKey(key));
+        const auto key = vkeyToPgmKey(wParam, lParam);
+        dispatcher->emplace_dispatch<WindowEvents::WindowKeyDown>(key);
     }
     break;
 
@@ -54,26 +117,8 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     case WM_KEYUP: {
         PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
 
-        auto key = wParam;
-        switch (key)
-        {
-        // Check the scancode to distinguish between left and right shift
-        case VK_SHIFT: {
-            static UINT lShift = MapVirtualKeyW(VK_LSHIFT, MAPVK_VK_TO_VSC);
-            UINT scancode = static_cast<UINT>((lParam & (0xFF << 16)) >> 16);
-            key = scancode == lShift ? Input::LShift : Input::RShift;
-        }
-
-        // Check the "extended" flag to distinguish between left and right alt
-        case VK_MENU:
-            key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RAlt : Input::LAlt;
-
-        // Check the "extended" flag to distinguish between left and right control
-        case VK_CONTROL:
-            key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RControl : Input::LControl;
-        }
-
-        dispatcher->emplace_dispatch<WindowEvents::WindowKeyUp>(Input::detail::convertFromPlatformKey(key));
+        const auto key = vkeyToPgmKey(wParam, lParam);
+        dispatcher->emplace_dispatch<WindowEvents::WindowKeyUp>(key);
     }
     break;
 
@@ -149,7 +194,7 @@ RectInt Window::rect() const
 #ifdef PGM_ASSERTS_ENABLED
     PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect)
+    GetWindowRect(m_Impl->window_handle, &rect);
 #endif
 
     return RectInt{static_cast<int>(rect.left), static_cast<int>(rect.bottom), static_cast<int>(rect.right - rect.left),
@@ -164,7 +209,7 @@ int Window::width() const
 #ifdef PGM_ASSERTS_ENABLED
     PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect)
+    GetWindowRect(m_Impl->window_handle, &rect);
 #endif
 
     return static_cast<int>(rect.right - rect.left);
@@ -178,7 +223,7 @@ int Window::height() const
 #ifdef PGM_ASSERTS_ENABLED
     PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect)
+    GetWindowRect(m_Impl->window_handle, &rect);
 #endif
 
     return static_cast<int>(rect.bottom - rect.top);
@@ -245,7 +290,7 @@ void Window::setFullScreen(bool v)
         SetWindowPos(m_Impl->window_handle, HWND_NOTOPMOST, 0, 0, 800, 600, SWP_SHOWWINDOW);
         ShowWindow(m_Impl->window_handle, SW_RESTORE);
 
-        Logging::log_info("(Win32) {}", "Exited windowed mode");
+        Logging::log_info("(Win32) {}", "Exited full screen mode");
     }
 
     m_FullScreen = v;
@@ -262,10 +307,7 @@ bool Window::pumpMessages()
     {
         TranslateMessage(&message);
         DispatchMessage(&message);
-        if (message.message == WM_QUIT)
-        {
-            return false;
-        }
+        return message.message != WM_QUIT && message.message != WM_CLOSE;
     }
 
     return true;

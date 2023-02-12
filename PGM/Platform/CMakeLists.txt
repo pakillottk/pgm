@@ -22,6 +22,7 @@ if (WIN32)
   set(
     PLATFORM_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Input/Win32/Keyboard.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Input/Win32/Mouse.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Window/Win32/Window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Strings/Win32/Strings.cpp
   )

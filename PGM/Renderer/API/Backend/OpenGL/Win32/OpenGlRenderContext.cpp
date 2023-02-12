@@ -41,8 +41,6 @@ internal inline void configureOpenGlContext()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-
-    wglSwapIntervalEXT(1);
 }
 
 internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlContextFlagCreationMask flags)

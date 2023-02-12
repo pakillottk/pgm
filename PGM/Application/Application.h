@@ -61,6 +61,10 @@ class Application
 
   protected:
     virtual void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
+
+    virtual void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
+    virtual void onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent);
+
     virtual void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
     virtual void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
 
