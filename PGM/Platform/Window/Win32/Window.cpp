@@ -27,14 +27,16 @@ static inline Input::Key vkeyToPgmKey(WPARAM wParam, LPARAM lParam)
         UINT scancode = static_cast<UINT>((lParam & (0xFF << 16)) >> 16);
         key = scancode == lShift ? Input::LShift : Input::RShift;
     }
+    break;
 
     // Check the "extended" flag to distinguish between left and right alt
     case VK_MENU:
         key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RAlt : Input::LAlt;
-
+        break;
     // Check the "extended" flag to distinguish between left and right control
     case VK_CONTROL:
         key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RControl : Input::LControl;
+        break;
     }
 
     return Input::detail::convertFromPlatformKey(static_cast<int>(key));
