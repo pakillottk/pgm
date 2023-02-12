@@ -44,7 +44,8 @@ static inline Input::Key vkeyToPgmKey(WPARAM wParam, LPARAM lParam)
 
 LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    Events::EventQueue *dispatcher = reinterpret_cast<Events::EventQueue *>(GetWindowLongPtr(window, GWLP_USERDATA));
+    Events::EventDispatcher *dispatcher =
+        reinterpret_cast<Events::EventDispatcher *>(GetWindowLongPtr(window, GWLP_USERDATA));
     // Logging::log_debug("(Win32) WindowProc: Message={}", message);
 
     LRESULT Result = 0;

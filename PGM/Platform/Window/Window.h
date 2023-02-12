@@ -33,7 +33,7 @@ class Window
 
     void show();
 
-    inline Events::EventDispatcher *dispatcher()
+    inline Events::EventQueue *dispatcher()
     {
         return &m_Dispatcher;
     }
@@ -57,7 +57,7 @@ class Window
 
   private:
     Ref<window_impl_t> m_Impl;
-    Events::EventQueue m_Dispatcher;
+    Events::EventDispatcher m_Dispatcher;
 
     bool m_FullScreen;
 };

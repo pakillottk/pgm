@@ -3,6 +3,6 @@
 namespace PGM::Events
 {
 
-std::atomic<listener_id> EventDispatcher::g_LastListenerId = 0;
+std::atomic<listener_id> EventQueue::g_LastListenerId = 0;
 
 }

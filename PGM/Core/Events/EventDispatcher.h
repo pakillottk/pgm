@@ -18,7 +18,7 @@ namespace PGM::Events
 using event_id = size_t;
 using listener_id = size_t;
 
-class EventDispatcher;
+class EventQueue;
 
 struct EventListener final
 {
@@ -43,13 +43,13 @@ struct EventListener final
     {
     }
 
-    friend EventDispatcher;
+    friend EventQueue;
 };
 
 using ListenersMap = std::unordered_map<listener_id, std::function<void(const void *)>>;
 using EventDispatchTable = std::unordered_map<event_id, ListenersMap>;
 
-class EventDispatcher
+class EventQueue
 {
   public:
     template <typename EventType>
@@ -127,17 +127,17 @@ class EventDispatcher
     EventDispatchTable m_Listeners;
 };
 
-class EventQueue final : public EventDispatcher
+class EventDispatcher final : public EventQueue
 {
   public:
     template <typename EventType> inline void dispatch(const EventType &event) const
     {
-        EventDispatcher::dispatch<EventType>(event);
+        EventQueue::dispatch<EventType>(event);
     }
 
     template <typename EventType, typename... Args> inline void emplace_dispatch(Args &&...args)
     {
-        EventDispatcher::dispatch<EventType>(EventType{std::forward<Args>(args)...});
+        EventQueue::dispatch<EventType>(EventType{std::forward<Args>(args)...});
     }
 };
 
