@@ -61,6 +61,8 @@ class Application
 
   protected:
     virtual void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
+    virtual void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
+    virtual void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
 
   private:
     void bindEvents();

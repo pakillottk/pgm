@@ -24,8 +24,17 @@ struct EventListener final
 {
     inline ~EventListener()
     {
-        m_UnsuscribeCallback();
+        if (m_UnsuscribeCallback)
+        {
+            m_UnsuscribeCallback();
+        }
     }
+
+    EventListener(EventListener &&) noexcept = default;
+    EventListener &operator=(EventListener &&) = default;
+
+    EventListener(const EventListener &) = delete;
+    EventListener &operator=(const EventListener &) = delete;
 
   private:
     std::function<void()> m_UnsuscribeCallback;
@@ -82,21 +91,28 @@ class EventDispatcher
   protected:
     template <typename EventType> inline void dispatch(const EventType &event) const
     {
-        std::scoped_lock<std::mutex> lk{m_Lock};
+        std::unique_lock<std::mutex> lk{m_Lock, std::defer_lock};
+        // FIXME(pgm) This is to prevent a nasty exception if an event is dispatched while handling another event
+        // dispatch
+        if (++m_DispatchLevel == 1)
+        {
+            lk.lock();
+        }
 
         // Logging::log_debug("(EventDispatcher) Dispatched event: {}", typeid(EventType).name());
 
         // Find queue of event
         auto queueIt = m_Listeners.find(typeid(EventType).hash_code());
-        if (queueIt == m_Listeners.cend())
+        if (queueIt != m_Listeners.cend())
         {
-            // no suscribers to this event
-            return;
-        }
 
-        const auto &queue = queueIt->second;
-        std::for_each(queue.cbegin(), queue.cend(),
-                      [&event](const auto &listener) { listener.second(reinterpret_cast<const void *>(&event)); });
+            const auto &queue = queueIt->second;
+            std::for_each(queue.cbegin(), queue.cend(),
+                          [&event](const auto &listener) { listener.second(reinterpret_cast<const void *>(&event)); });
+        }
+        // else: no suscribers to this event
+
+        --m_DispatchLevel;
     }
 
   private:
@@ -107,6 +123,7 @@ class EventDispatcher
     }
 
     mutable std::mutex m_Lock;
+    mutable std::atomic<size_t> m_DispatchLevel{0};
     EventDispatchTable m_Listeners;
 };
 

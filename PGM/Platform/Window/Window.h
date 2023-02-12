@@ -31,17 +31,24 @@ class Window
     int width() const;
     int height() const;
 
-    void show() const;
+    void show();
 
-    inline Events::EventDispatcher &dispatcher()
+    inline Events::EventDispatcher *dispatcher()
     {
-        return m_Dispatcher;
+        return &m_Dispatcher;
     }
+
+    inline bool isFullScreen() const
+    {
+        return m_FullScreen;
+    }
+
+    void setFullScreen(bool v);
 
     /**
      * Runs the window's main loop
      */
-    bool pumpMessages() const;
+    bool pumpMessages();
 
     Window(const Window &) = delete;
     Window &operator=(const Window &) = delete;
@@ -51,6 +58,8 @@ class Window
   private:
     Ref<window_impl_t> m_Impl;
     Events::EventQueue m_Dispatcher;
+
+    bool m_FullScreen;
 };
 
 } // namespace PGM::Platform

@@ -41,6 +41,8 @@ internal inline void configureOpenGlContext()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    wglSwapIntervalEXT(1);
 }
 
 internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlContextFlagCreationMask flags)
@@ -93,9 +95,6 @@ internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlC
     }
 
     GLint attribs[] = {WGL_CONTEXT_MAJOR_VERSION_ARB, desiredMajor, WGL_CONTEXT_MINOR_VERSION_ARB, desiredMinor,
-                       // TODO(pgm) For now, compatibility mode...
-                       // Forward compatibility mode
-                       //                        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                        // Compatibility profile
                        WGL_CONTEXT_PROFILE_MASK_ARB,
                        (flags & bOglContextCompatibiltyMode) > 0 ? WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB

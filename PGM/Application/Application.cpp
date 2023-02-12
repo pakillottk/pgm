@@ -9,6 +9,12 @@ namespace PGM
 void Application::run()
 {
     m_Window->show();
+
+    const int DURATION = 1000;
+    const float DELTA = 1.0f / DURATION;
+    size_t frame = 0;
+    float t = 0.0f;
+    int dir = 1;
     while (m_Window->pumpMessages())
     {
         // TODO: FPS Cap
@@ -19,22 +25,50 @@ void Application::run()
         }
 
         m_RenderContext->setViewport({0, 0, m_Window->width(), m_Window->height()});
-        m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, Colors::Black);
+        // m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, Colors::Black);
+
+        Color clearColor{t, t, t, 1.0f};
+        m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, clearColor);
 
         m_RenderContext.swapBuffers();
         m_RenderContext.unbind();
+
+        ++frame;
+        if ((dir > 0 && t >= 1.0f) || (dir < 0 && t <= 0.0f))
+        {
+            dir *= -1;
+        }
+        t += DELTA * dir;
     }
 }
 
 void Application::onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent)
 {
-    Logging::log_info("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
+    Logging::log_debug("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
+}
+
+void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
+{
+    Logging::log_debug("Key pressed: {}", keyDownEvent.key);
+    if (keyDownEvent.key == Platform::Input::Enter && Platform::Input::isKeyDown(Platform::Input::LAlt))
+    {
+        m_Window->setFullScreen(!m_Window->isFullScreen());
+    }
+}
+
+void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
+{
+    Logging::log_debug("Key released: {}", keyUpEvent.key);
 }
 
 void Application::bindEvents()
 {
-    m_EventListeners.push_back(m_Window->dispatcher().suscribe<Platform::WindowEvents::WindowResizedEvent>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowResizedEvent>(
         [this](const auto &event) { this->onWindowResized(event); }));
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowKeyDown>(
+        [this](const auto &event) { this->onKeyDown(event); }));
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowKeyUp>(
+        [this](const auto &event) { this->onKeyUp(event); }));
 }
 
 } // namespace PGM

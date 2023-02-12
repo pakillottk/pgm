@@ -18,10 +18,10 @@ namespace PGM::Platform
 
 LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    Events::EventQueue *dispatcher = reinterpret_cast<Events::EventQueue *>(GetWindowLongPtr(window, GWLP_USERDATA));
     // Logging::log_debug("(Win32) WindowProc: Message={}", message);
 
     LRESULT Result = 0;
-
     switch (message)
     {
     case WM_DESTROY: {
@@ -30,8 +30,6 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     break;
 
     case WM_SIZE: {
-        Events::EventQueue *dispatcher =
-            reinterpret_cast<Events::EventQueue *>(GetWindowLongPtr(window, GWLP_USERDATA));
         PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
 
         // Resized
@@ -40,6 +38,42 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         dispatcher->emplace_dispatch<WindowEvents::WindowResizedEvent>(static_cast<int>(width),
                                                                        static_cast<int>(height));
         Result = DefWindowProcW(window, message, wParam, lParam);
+    }
+    break;
+
+    case WM_SYSKEYDOWN:
+    case WM_KEYDOWN: {
+        PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
+
+        const auto key = wParam;
+        dispatcher->emplace_dispatch<WindowEvents::WindowKeyDown>(Input::detail::convertFromPlatformKey(key));
+    }
+    break;
+
+    case WM_SYSKEYUP:
+    case WM_KEYUP: {
+        PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
+
+        auto key = wParam;
+        switch (key)
+        {
+        // Check the scancode to distinguish between left and right shift
+        case VK_SHIFT: {
+            static UINT lShift = MapVirtualKeyW(VK_LSHIFT, MAPVK_VK_TO_VSC);
+            UINT scancode = static_cast<UINT>((lParam & (0xFF << 16)) >> 16);
+            key = scancode == lShift ? Input::LShift : Input::RShift;
+        }
+
+        // Check the "extended" flag to distinguish between left and right alt
+        case VK_MENU:
+            key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RAlt : Input::LAlt;
+
+        // Check the "extended" flag to distinguish between left and right control
+        case VK_CONTROL:
+            key = (HIWORD(lParam) & KF_EXTENDED) ? Input::RControl : Input::LControl;
+        }
+
+        dispatcher->emplace_dispatch<WindowEvents::WindowKeyUp>(Input::detail::convertFromPlatformKey(key));
     }
     break;
 
@@ -85,6 +119,7 @@ internal Window::window_impl_t win32_create_window(const std::string_view &title
 }
 
 Window::Window(const std::string_view &title, unsigned w /*= 800*/, unsigned h /*= 600*/, FLAGS flags /*= bDefault*/)
+    : m_FullScreen{false}
 {
     auto ctx = win32_create_window(title, w, h, flags);
     if (!ctx.window_handle)
@@ -149,26 +184,88 @@ int Window::height() const
     return static_cast<int>(rect.bottom - rect.top);
 }
 
-void Window::show() const
+void Window::show()
 {
     PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
     ShowWindow(m_Impl->window_handle, 1);
 }
 
-bool Window::pumpMessages() const
+void Window::setFullScreen(bool v)
 {
     PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
 
-    MSG Message;
-    BOOL MessageResult = GetMessage(&Message, m_Impl->window_handle, 0, 0);
-    if (MessageResult > 0)
+    if (m_FullScreen == v)
     {
-        TranslateMessage(&Message);
-        DispatchMessage(&Message);
+        return;
+    }
+
+    if (v)
+    {
+        Logging::log_debug("(Win32) {}", "Entering fullscreen");
+
+        DEVMODE fullscreenSettings;
+
+        const auto screenWidth = GetDeviceCaps(m_Impl->hdc, HORZRES);
+        const auto screenHeight = GetDeviceCaps(m_Impl->hdc, VERTRES);
+
+        int colourBits = GetDeviceCaps(m_Impl->hdc, BITSPIXEL);
+        int refreshRate = GetDeviceCaps(m_Impl->hdc, VREFRESH);
+
+        if (EnumDisplaySettings(NULL, 0, &fullscreenSettings) == FALSE)
+        {
+            Logging::log_error("(Win32) {}", "EnumDisplaySettings failed");
+        }
+
+        fullscreenSettings.dmPelsWidth = screenWidth;
+        fullscreenSettings.dmPelsHeight = screenHeight;
+        fullscreenSettings.dmBitsPerPel = colourBits;
+        fullscreenSettings.dmDisplayFrequency = refreshRate;
+        fullscreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+
+        SetWindowLongPtr(m_Impl->window_handle, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
+        SetWindowLongPtr(m_Impl->window_handle, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        SetWindowPos(m_Impl->window_handle, HWND_TOPMOST, 0, 0, screenWidth, screenHeight, SWP_SHOWWINDOW);
+        if (ChangeDisplaySettings(&fullscreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+        {
+            Logging::log_error("(Win32) {}", "ChangeDisplaySettings failed");
+        }
+        ShowWindow(m_Impl->window_handle, SW_MAXIMIZE);
+        Logging::log_info("(Win32) {}", "Entered full screen mode");
     }
     else
     {
-        return false;
+        Logging::log_debug("(Win32) {}", "Exit fullscreen");
+
+        SetWindowLongPtr(m_Impl->window_handle, GWL_EXSTYLE, WS_EX_LEFT);
+        SetWindowLongPtr(m_Impl->window_handle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+        if (ChangeDisplaySettings(NULL, CDS_RESET) != DISP_CHANGE_SUCCESSFUL)
+        {
+            Logging::log_error("(Win32) {}", "ChangeDisplaySettings failed");
+        }
+        SetWindowPos(m_Impl->window_handle, HWND_NOTOPMOST, 0, 0, 800, 600, SWP_SHOWWINDOW);
+        ShowWindow(m_Impl->window_handle, SW_RESTORE);
+
+        Logging::log_info("(Win32) {}", "Exited windowed mode");
+    }
+
+    m_FullScreen = v;
+}
+
+bool Window::pumpMessages()
+{
+    PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
+
+    // TODO(pgm) Must detect the window destruction to return false
+    MSG message;
+    BOOL messageResult = PeekMessage(&message, m_Impl->window_handle, 0, 0, PM_REMOVE);
+    if (messageResult == TRUE)
+    {
+        TranslateMessage(&message);
+        DispatchMessage(&message);
+        if (message.message == WM_QUIT)
+        {
+            return false;
+        }
     }
 
     return true;
