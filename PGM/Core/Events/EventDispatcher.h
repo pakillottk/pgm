@@ -89,6 +89,20 @@ class EventQueue
     }
 
   protected:
+    EventDispatchTable m_Listeners;
+    mutable std::mutex m_Lock;
+
+  private:
+    static std::atomic<listener_id> g_LastListenerId;
+    static inline listener_id genId()
+    {
+        return ++g_LastListenerId;
+    }
+};
+
+class EventDispatcher final : public EventQueue
+{
+  public:
     template <typename EventType> inline void dispatch(const EventType &event) const
     {
         std::unique_lock<std::mutex> lk{m_Lock, std::defer_lock};
@@ -115,30 +129,13 @@ class EventQueue
         --m_DispatchLevel;
     }
 
-  private:
-    static std::atomic<listener_id> g_LastListenerId;
-    static inline listener_id genId()
-    {
-        return ++g_LastListenerId;
-    }
-
-    mutable std::mutex m_Lock;
-    mutable std::atomic<size_t> m_DispatchLevel{0};
-    EventDispatchTable m_Listeners;
-};
-
-class EventDispatcher final : public EventQueue
-{
-  public:
-    template <typename EventType> inline void dispatch(const EventType &event) const
-    {
-        EventQueue::dispatch<EventType>(event);
-    }
-
     template <typename EventType, typename... Args> inline void emplace_dispatch(Args &&...args)
     {
-        EventQueue::dispatch<EventType>(EventType{std::forward<Args>(args)...});
+        dispatch<EventType>(EventType{std::forward<Args>(args)...});
     }
+
+  private:
+    mutable std::atomic<size_t> m_DispatchLevel{0};
 };
 
 } // namespace PGM::Events
