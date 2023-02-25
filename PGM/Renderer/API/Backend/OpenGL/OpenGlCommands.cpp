@@ -55,15 +55,16 @@ void OpenGlCommands::setViewport(const RectInt &viewportRect) const
     PGM_CHECK_GL();
 }
 
-Ref<Buffers::GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t size, const void *data /*= nullptr*/) const
+SharedRef<Buffers::GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t size,
+                                                           const void *data /*= nullptr*/) const
 {
     if (dynamic)
     {
-        return make_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlDynamicBufferTraits{}, size, data);
+        return make_shared_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlDynamicBufferTraits{}, size, data);
     }
     else
     {
-        return make_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlStaticBufferTraits{}, size, data);
+        return make_shared_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlStaticBufferTraits{}, size, data);
     }
 }
 

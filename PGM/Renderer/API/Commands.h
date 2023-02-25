@@ -22,7 +22,7 @@ struct Commands
 {
     virtual void clear(ClearBufferMask mask, Color clearColor = Colors::Black) const = 0;
     virtual void setViewport(const RectInt &viewportRect) const = 0;
-    virtual Ref<Buffers::GpuBuffer> createBuffer(bool dynamic, size_t size, const void *data = nullptr) const = 0;
+    virtual SharedRef<Buffers::GpuBuffer> createBuffer(bool dynamic, size_t size, const void *data = nullptr) const = 0;
 };
 
 } // namespace PGM::Renderer::API

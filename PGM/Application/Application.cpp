@@ -24,6 +24,11 @@ void Application::run()
     int dir = 1;
     while (m_Window->pumpMessages())
     {
+        if (m_WindowClosed)
+        {
+            break;
+        }
+
         // TODO: FPS Cap
         std::scoped_lock<std::mutex> lk{m_RendererMutex};
         if (!m_RenderContext.bind())
@@ -60,6 +65,12 @@ void Application::run()
     }
 }
 
+void Application::onWindowClose([[maybe_unused]] const Platform::WindowEvents::WindowClose &closeEvent)
+{
+    m_WindowClosed = true;
+    Logging::log_debug("Window closed");
+}
+
 void Application::onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent)
 {
     Logging::log_debug("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
@@ -92,6 +103,9 @@ void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
 
 void Application::bindEvents()
 {
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowClose>(
+        [this](const auto &event) { this->onWindowClose(event); }));
+
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowResizedEvent>(
         [this](const auto &event) { this->onWindowResized(event); }));
 

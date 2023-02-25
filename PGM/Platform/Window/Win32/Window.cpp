@@ -336,6 +336,13 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
 
+    case WM_CLOSE: {
+        dispatcher->emplace_dispatch<WindowEvents::WindowClose>();
+        Result = DefWindowProcW(window, message, wParam, lParam);
+        PostQuitMessage(0);
+    }
+    break;
+
     default:
         Result = DefWindowProcW(window, message, wParam, lParam);
         break;
@@ -514,17 +521,23 @@ bool Window::pumpMessages()
 {
     PGM_ASSERT(m_Impl && m_Impl->window_handle, "Invalid window context");
 
-    // TODO(pgm) Must detect the window destruction to return false
     MSG message;
-    BOOL messageResult = PeekMessage(&message, m_Impl->window_handle, 0, 0, PM_REMOVE);
+    BOOL hasMessage = PeekMessage(&message, m_Impl->window_handle, 0, 0, PM_NOREMOVE);
+    if (hasMessage == FALSE)
+    {
+        // does not means that app is over...
+        return true;
+    }
+
+    BOOL messageResult = GetMessage(&message, m_Impl->window_handle, 0, 0);
     if (messageResult == TRUE)
     {
         TranslateMessage(&message);
         DispatchMessage(&message);
-        return message.message != WM_QUIT && message.message != WM_CLOSE;
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 } // namespace PGM::Platform

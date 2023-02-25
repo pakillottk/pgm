@@ -60,6 +60,7 @@ class Application
     void run();
 
   protected:
+    virtual void onWindowClose(const Platform::WindowEvents::WindowClose &closeEvent);
     virtual void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
 
     virtual void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
@@ -86,13 +87,14 @@ class Application
     }
 
     inline Application(SharedRef<Platform::Window> wnd, Renderer::RenderContext context)
-        : m_Window{wnd}, m_RenderContext{std::move(context)}
+        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}
     {
         bindEvents();
     }
 
     SharedRef<Platform::Window> m_Window;
     Renderer::RenderContext m_RenderContext;
+    bool m_WindowClosed;
 
     std::mutex m_RendererMutex;
     std::vector<Events::EventListener> m_EventListeners;

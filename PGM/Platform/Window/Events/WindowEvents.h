@@ -33,4 +33,8 @@ struct MouseButtonUp final
     Input::MouseButton button;
 };
 
+struct WindowClose final
+{
+};
+
 } // namespace PGM::Platform::WindowEvents
