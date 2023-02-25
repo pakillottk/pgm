@@ -1,5 +1,8 @@
 #include "OpenGlCommands.h"
 
+#include "Buffers/GpuBufferTraits.h"
+#include "GlCheck.h"
+
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Logging/Logger.h>
 
@@ -16,46 +19,6 @@
 
 namespace PGM::Renderer::API::Backend
 {
-
-internal inline GLenum glCheckError(const char *file, int line)
-{
-    GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR)
-    {
-        std::string error;
-        switch (errorCode)
-        {
-        case GL_INVALID_ENUM:
-            error = "INVALID_ENUM";
-            break;
-        case GL_INVALID_VALUE:
-            error = "INVALID_VALUE";
-            break;
-        case GL_INVALID_OPERATION:
-            error = "INVALID_OPERATION";
-            break;
-        case GL_STACK_OVERFLOW:
-            error = "STACK_OVERFLOW";
-            break;
-        case GL_STACK_UNDERFLOW:
-            error = "STACK_UNDERFLOW";
-            break;
-        case GL_OUT_OF_MEMORY:
-            error = "OUT_OF_MEMORY";
-            break;
-        case GL_INVALID_FRAMEBUFFER_OPERATION:
-            error = "INVALID_FRAMEBUFFER_OPERATION";
-            break;
-        }
-        Logging::log_error("(OpenGL) Error: {}\tSource: {}:{}", error, file, line);
-    }
-    return errorCode;
-}
-#ifdef PGM_ASSERTS_ENABLED
-#define PGM_CHECK_GL() PGM_ASSERT(glCheckError(__FILE__, __LINE__) == GL_NO_ERROR, "OpenGL Error");
-#else
-#define PGM_CHECK_GL() glCheckError(__FILE__, __LINE__)
-#endif
 
 void OpenGlCommands::clear(ClearBufferMask mask, Color clearColor /*= Colors::Black*/) const
 {
@@ -90,6 +53,18 @@ void OpenGlCommands::setViewport(const RectInt &viewportRect) const
                static_cast<GLsizei>(viewportRect.width), static_cast<GLsizei>(viewportRect.height));
 
     PGM_CHECK_GL();
+}
+
+Ref<Buffers::GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t size, const void *data /*= nullptr*/) const
+{
+    if (dynamic)
+    {
+        return make_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlDynamicBufferTraits{}, size, data);
+    }
+    else
+    {
+        return make_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlStaticBufferTraits{}, size, data);
+    }
 }
 
 } // namespace PGM::Renderer::API::Backend

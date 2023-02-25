@@ -34,6 +34,17 @@ void Application::run()
         m_RenderContext->setViewport({0, 0, m_Window->width(), m_Window->height()});
         // m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, Colors::Black);
 
+        auto buff = m_RenderContext->createBuffer(false, sizeof(int));
+        const int data = 4;
+        buff->write(0, 4);
+
+        auto dynBuff = m_RenderContext->createBuffer(true, sizeof(int));
+        dynBuff->write(0, data);
+        dynBuff->commit();
+
+        buff->destroy();
+        dynBuff->destroy();
+
         Color clearColor{t, t, t, 1.0f};
         m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, clearColor);
 

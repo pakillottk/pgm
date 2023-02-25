@@ -113,10 +113,4 @@ enum Key
 
 bool isKeyDown(Key key);
 
-namespace detail
-{
-    Key convertFromPlatformKey(int nativeKey);
-    int convertToPlatformKey(Key key);
-} // namespace detail
-
 } // namespace PGM::Platform::Input
