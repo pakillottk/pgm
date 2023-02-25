@@ -35,9 +35,6 @@ target_link_libraries(
     pgm::core 
     pgm::platform
     pgm::renderer
-
-  PRIVATE
-    ${OPENGL_LIBRARIES}
 )
 
 if(MSVC)

@@ -12,10 +12,8 @@ add_executable(pgm_sandbox ${SOURCES})
 
 target_link_libraries(
   pgm_sandbox 
+
   PRIVATE 
-    pgm::core 
-    pgm::platform 
-    pgm::renderer
     pgm::application
 )
 
