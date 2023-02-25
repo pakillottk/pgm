@@ -102,7 +102,7 @@ class GpuBuffer
         {
         }
 
-        inline bool dynamic() const
+        inline bool dynamic() const override
         {
             return m_Buffer.dynamic();
         }
