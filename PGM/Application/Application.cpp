@@ -41,14 +41,22 @@ void Application::run()
 
         auto buff = m_RenderContext->createBuffer(false, sizeof(int));
         const int data = 4;
-        buff->write(0, 4);
+        buff->write(0, data);
 
         auto dynBuff = m_RenderContext->createBuffer(true, sizeof(int));
         dynBuff->write(0, data);
-        dynBuff->commit();
 
-        buff->destroy();
-        dynBuff->destroy();
+        auto vertexArray = m_RenderContext->createIndexedVertexArray(
+            PGM::Renderer::API::Buffers::VertexAttrib{buff, PGM::Renderer::API::Buffers::Position,
+                                                      PGM::Renderer::API::Buffers::Int, 1, 0, 0},
+            {
+                PGM::Renderer::API::Buffers::VertexAttrib{dynBuff, PGM::Renderer::API::Buffers::Position,
+                                                          PGM::Renderer::API::Buffers::Int, 1, 0, 0},
+            });
+        vertexArray->bind();
+        vertexArray->unbind();
+
+        vertexArray->destroy();
 
         Color clearColor{t, t, t, 1.0f};
         m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, clearColor);

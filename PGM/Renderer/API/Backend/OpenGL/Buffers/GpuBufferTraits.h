@@ -17,14 +17,9 @@
 namespace PGM::Renderer::API::Backend::OpenGL::Buffers
 {
 
-struct OpenGlStaticBufferTraits
+namespace detail
 {
-    inline bool dynamic() const
-    {
-        return false;
-    }
-
-    inline int genBuffer()
+    inline int genGlBuffer()
     {
         GLuint id = 0;
         glGenBuffers(1, &id);
@@ -40,22 +35,35 @@ struct OpenGlStaticBufferTraits
         return static_cast<int>(id);
     }
 
-    inline void destroy(int id)
+    inline void destroyGlBuffer(int id)
     {
         GLuint glId{static_cast<GLuint>(id)};
         glDeleteBuffers(1, &glId);
         PGM_CHECK_GL();
+    }
+} // namespace detail
+
+struct OpenGlStaticBufferTraits final
+{
+    inline bool dynamic() const
+    {
+        return false;
+    }
+
+    inline int genBuffer()
+    {
+        return detail::genGlBuffer();
+    }
+
+    inline void destroy(int id)
+    {
+        detail::destroyGlBuffer(id);
     }
 
     inline void allocate(int id, size_t size, const void *data) const
     {
         glNamedBufferData(id, static_cast<GLsizeiptr>(size), data, GL_STATIC_DRAW);
         PGM_CHECK_GL();
-    }
-
-    inline int resize([[maybe_unused]] int id, [[maybe_unused]] size_t size) const
-    {
-        throw std::runtime_error{"Can't resize a static buffer"};
     }
 
     inline void write(int id, size_t offset, size_t size, const void *data) const
@@ -69,7 +77,7 @@ struct OpenGlStaticBufferTraits
     }
 };
 
-struct OpenGlDynamicBufferTraits
+struct OpenGlDynamicBufferTraits final
 {
   private:
     mutable std::vector<std::byte> m_Data;
@@ -82,25 +90,12 @@ struct OpenGlDynamicBufferTraits
 
     inline int genBuffer()
     {
-        GLuint id = 0;
-        glGenBuffers(1, &id);
-        PGM_CHECK_GL();
-        if (id == 0)
-        {
-            return PGM::Renderer::API::Buffers::NULL_BUFFER_ID;
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, id);
-        PGM_CHECK_GL();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        return static_cast<int>(id);
+        return detail::genGlBuffer();
     }
 
     inline void destroy(int id)
     {
-        GLuint glId{static_cast<GLuint>(id)};
-        glDeleteBuffers(1, &glId);
-        PGM_CHECK_GL();
+        detail::destroyGlBuffer(id);
         // NOTE(pgm) This ensures that memory is released
         m_Data = std::vector<std::byte>{};
     }
@@ -114,13 +109,12 @@ struct OpenGlDynamicBufferTraits
         }
     }
 
-    inline void resize([[maybe_unused]] int id, size_t size) const
-    {
-        m_Data.resize(size);
-    }
-
     inline void write([[maybe_unused]] int id, size_t offset, size_t size, const void *data) const
     {
+        if ((offset + size) > m_Data.size())
+        {
+            m_Data.resize(offset + size);
+        }
         memcpy(&m_Data[0] + offset, data, size);
     }
 

@@ -1,6 +1,7 @@
 #include "OpenGlCommands.h"
 
 #include "Buffers/GpuBufferTraits.h"
+#include "Buffers/VertexArrayImpl.h"
 #include "GlCheck.h"
 
 #include <PGM/Core/Assert/Assert.h>
@@ -66,6 +67,18 @@ SharedRef<Buffers::GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t 
     {
         return make_shared_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlStaticBufferTraits{}, size, data);
     }
+}
+
+SharedRef<Buffers::VertexArray> OpenGlCommands::createVertexArray(
+    std::initializer_list<Buffers::VertexAttrib> attributes) const
+{
+    return make_shared_ref<OpenGL::Buffers::VertexArrayImpl>(attributes);
+}
+
+SharedRef<Buffers::VertexArray> OpenGlCommands::createIndexedVertexArray(
+    const Buffers::VertexAttrib &indexAttribute, std::initializer_list<Buffers::VertexAttrib> attributes) const
+{
+    return make_shared_ref<OpenGL::Buffers::VertexArrayImpl>(indexAttribute, attributes);
 }
 
 } // namespace PGM::Renderer::API::Backend

@@ -60,14 +60,14 @@ class Application
     void run();
 
   protected:
-    virtual void onWindowClose(const Platform::WindowEvents::WindowClose &closeEvent);
-    virtual void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
+    void onWindowClose(const Platform::WindowEvents::WindowClose &closeEvent);
+    void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
 
-    virtual void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
-    virtual void onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent);
+    void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
+    void onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent);
 
-    virtual void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
-    virtual void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
+    void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
+    void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
 
   private:
     void bindEvents();

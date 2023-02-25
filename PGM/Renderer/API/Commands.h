@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Buffers/GpuBuffer.h"
+#include "Buffers/VertexArray.h"
 
 #include <PGM/Core/Color/Color.h>
 #include <PGM/Core/Rect/Rect.h>
@@ -22,7 +23,13 @@ struct Commands
 {
     virtual void clear(ClearBufferMask mask, Color clearColor = Colors::Black) const = 0;
     virtual void setViewport(const RectInt &viewportRect) const = 0;
+
     virtual SharedRef<Buffers::GpuBuffer> createBuffer(bool dynamic, size_t size, const void *data = nullptr) const = 0;
+
+    virtual SharedRef<Buffers::VertexArray> createVertexArray(
+        std::initializer_list<Buffers::VertexAttrib> attributes) const = 0;
+    virtual SharedRef<Buffers::VertexArray> createIndexedVertexArray(
+        const Buffers::VertexAttrib &indexAttribute, std::initializer_list<Buffers::VertexAttrib> attributes) const = 0;
 };
 
 } // namespace PGM::Renderer::API

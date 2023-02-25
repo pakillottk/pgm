@@ -17,7 +17,6 @@ struct BufferTraitsInterface
     virtual int genBuffer() = 0;
     virtual void destroy(int id) = 0;
     virtual void allocate(int id, size_t size, const void *data) = 0;
-    virtual void resize(int id, size_t size) = 0;
     virtual void write(int id, size_t offset, size_t size, const void *data) = 0;
     virtual void commit(int id) = 0;
 };
@@ -46,15 +45,24 @@ class GpuBuffer
         return m_Id != NULL_BUFFER_ID;
     }
 
-    int id() const
+    inline int id() const
     {
         PGM_ASSERT(m_Id != NULL_BUFFER_ID, "Invalid buffer id");
         return m_Id;
     }
 
+    inline bool dynamic() const
+    {
+        return m_Buffer->dynamic();
+    }
+
     inline void destroy()
     {
-        PGM_ASSERT(m_Id != NULL_BUFFER_ID, "Invalid buffer id");
+        if (m_Id == NULL_BUFFER_ID)
+        {
+            return;
+        }
+
         m_Buffer->destroy(m_Id);
         m_Id = NULL_BUFFER_ID;
     }
@@ -66,18 +74,10 @@ class GpuBuffer
         m_Size = size;
     }
 
-    inline void resize(size_t size)
-    {
-        PGM_ASSERT(m_Id != NULL_BUFFER_ID, "Invalid buffer id");
-        PGM_ASSERT(m_Buffer->dynamic(), "Attempted to resize static buffer....");
-        m_Buffer->resize(m_Id, size);
-        m_Size = size;
-    }
-
     inline void write(size_t offset, size_t size, const void *data)
     {
         PGM_ASSERT(m_Id != NULL_BUFFER_ID, "Invalid buffer id");
-        PGM_ASSERT((offset + size) <= m_Size, "Out of buffer bounds");
+        PGM_ASSERT(dynamic() || (offset + size) <= m_Size, "Out of buffer bounds");
         m_Buffer->write(m_Id, offset, size, data);
     }
 
@@ -120,11 +120,6 @@ class GpuBuffer
         inline void allocate(int id, size_t size, const void *data) override
         {
             m_Buffer.allocate(id, size, data);
-        }
-
-        inline void resize(int id, size_t size) override
-        {
-            m_Buffer.resize(id, size);
         }
 
         inline void write(int id, size_t offset, size_t size, const void *data) override
