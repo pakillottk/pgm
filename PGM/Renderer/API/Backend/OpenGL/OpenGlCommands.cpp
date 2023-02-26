@@ -3,6 +3,7 @@
 #include "Buffers/GpuBufferTraits.h"
 #include "Buffers/VertexArrayImpl.h"
 #include "GlCheck.h"
+#include "Shaders/OpenGlShader.h"
 
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Logging/Logger.h>
@@ -79,6 +80,12 @@ SharedRef<Buffers::VertexArray> OpenGlCommands::createIndexedVertexArray(
     const Buffers::VertexAttrib &indexAttribute, std::initializer_list<Buffers::VertexAttrib> attributes) const
 {
     return make_shared_ref<OpenGL::Buffers::VertexArrayImpl>(indexAttribute, attributes);
+}
+
+SharedRef<Shaders::Shader> OpenGlCommands::createShader(const std::string_view &vertexSource,
+                                                        const std::string_view &fragmentSource) const
+{
+    return make_shared_ref<OpenGL::Shaders::OpenGlShader>(vertexSource, fragmentSource);
 }
 
 } // namespace PGM::Renderer::API::Backend

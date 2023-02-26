@@ -27,6 +27,7 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/API/Buffers/VertexArray.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/OpenGlCommands.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Buffers/VertexArrayImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Shaders/OpenGlShader.cpp
 )
 
 # platform specific

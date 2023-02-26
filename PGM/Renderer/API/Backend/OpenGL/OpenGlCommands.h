@@ -18,6 +18,9 @@ struct OpenGlCommands : public Commands
     SharedRef<Buffers::VertexArray> createIndexedVertexArray(
         const Buffers::VertexAttrib &indexAttribute,
         std::initializer_list<Buffers::VertexAttrib> attributes) const override;
+
+    SharedRef<Shaders::Shader> createShader(const std::string_view &vertexSource,
+                                            const std::string_view &fragmentSource) const override;
 };
 
 } // namespace PGM::Renderer::API::Backend
