@@ -20,4 +20,6 @@ template <typename T, typename... Args> [[nodiscard]] SharedRef<T> make_shared_r
     return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
+template <typename T> using WeakRef = std::weak_ptr<T>;
+
 } // namespace PGM

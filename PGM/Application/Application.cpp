@@ -20,11 +20,8 @@ void Application::run()
 {
     m_Window->show();
 
-    const int DURATION = 1000;
-    const float DELTA = 1.0f / DURATION;
-    size_t frame = 0;
-    float t = 0.0f;
-    int dir = 1;
+    m_LastFrameTime = Timer::now();
+
     while (m_Window->pumpMessages())
     {
         if (m_WindowClosed)
@@ -39,77 +36,27 @@ void Application::run()
             break;
         }
 
-        m_RenderContext->setViewport({0, 0, m_Window->width(), m_Window->height()});
-        // m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, Colors::Black);
+        const auto time = Timer::now();
+        const Timespan deltaTime{m_LastFrameTime, time};
+        m_LastFrameTime = time;
 
-        auto buff = m_RenderContext->createBuffer(false, sizeof(int));
-        const int data = 4;
-        buff->write(0, data);
+        for (auto &system : m_SystemsStack)
+        {
+            system->beginFrame(*this);
+        }
 
-        auto dynBuff = m_RenderContext->createBuffer(true, sizeof(int));
-        dynBuff->write(0, data);
+        for (auto &system : m_SystemsStack)
+        {
+            system->onUpdate(*this, deltaTime);
+        }
 
-        auto vertexArray = m_RenderContext->createIndexedVertexArray(
-            PGM::Renderer::API::Buffers::VertexAttrib{buff, PGM::Renderer::API::Buffers::Position,
-                                                      PGM::Renderer::API::Buffers::Int, 1, 0, 0},
-            {
-                PGM::Renderer::API::Buffers::VertexAttrib{dynBuff, PGM::Renderer::API::Buffers::Position,
-                                                          PGM::Renderer::API::Buffers::Int, 1, 0, 0},
-            });
-        vertexArray->bind();
-        vertexArray->unbind();
-
-        vertexArray->destroy();
-
-        static const std::string vertexSrc = R"(
-            #version 330 core
-            
-            layout (location = 0) in vec3 aPos; // the position variable has attribute position 0
-            
-            out vec4 vertexColor; // specify a color output to the fragment shader
-
-            void main()
-            {
-                gl_Position = vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor
-                vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // set the output variable to a dark-red color
-            })";
-
-        static const std::string fragmentSrc = R"(
-            #version 330 core
-
-            out vec4 FragColor;
-            
-            in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)  
-
-            void main()
-            {
-                FragColor = vertexColor;
-            })";
-
-        auto shader = m_RenderContext->createShader(vertexSrc, fragmentSrc);
-        shader->bind();
-        shader->unbind();
-        shader->destroy();
-
-        static const int pixel = 0xff0000ff;
-        auto texture = m_RenderContext->createTexture2d(PGM::Renderer::API::Textures::Byte, 4, 1, 1, &pixel);
-        texture->write(0, 0, 1, 1, &pixel);
-        texture->bind(0);
-        texture->unbind();
-        texture->destroy();
-
-        Color clearColor{t, t, t, 1.0f};
-        m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, clearColor);
+        for (auto &system : m_SystemsStack)
+        {
+            system->endFrame(*this);
+        }
 
         m_RenderContext.swapBuffers();
         m_RenderContext.unbind();
-
-        if ((dir > 0 && t >= 1.0f) || (dir < 0 && t <= 0.0f))
-        {
-            dir *= -1;
-        }
-        t += DELTA * dir;
-        ++frame;
     }
 }
 
@@ -128,25 +75,53 @@ void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mou
 {
     Logging::log_debug("Mouse button pressed: {} (Double clicked: {})", mouseDownEvent.button,
                        mouseDownEvent.isDoubleClick);
+
+    for (auto &system : m_SystemsStack)
+    {
+        if (system->onMouseDown(mouseDownEvent))
+        {
+            break;
+        }
+    }
 }
 
 void Application::onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent)
 {
     Logging::log_debug("Mouse button released: {}", mouseUpEvent.button);
+
+    for (auto &system : m_SystemsStack)
+    {
+        if (system->onMouseUp(mouseUpEvent))
+        {
+            break;
+        }
+    }
 }
 
 void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
 {
     Logging::log_debug("Key pressed: {}", keyDownEvent.key);
-    if (keyDownEvent.key == Platform::Input::Enter && Platform::Input::isKeyDown(Platform::Input::LAlt))
+
+    for (auto &system : m_SystemsStack)
     {
-        m_Window->setFullScreen(!m_Window->isFullScreen());
+        if (system->onKeyDown(keyDownEvent))
+        {
+            break;
+        }
     }
 }
 
 void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
 {
     Logging::log_debug("Key released: {}", keyUpEvent.key);
+
+    for (auto &system : m_SystemsStack)
+    {
+        if (system->onKeyUp(keyUpEvent))
+        {
+            break;
+        }
+    }
 }
 
 void Application::bindEvents()

@@ -1,7 +1,10 @@
 #pragma once
 
+#include "ApplicationSystemStack.h"
+
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Ref/Ref.h>
+#include <PGM/Core/Time/Time.h>
 #include <PGM/Platform/Window/Events/WindowEvents.h>
 #include <PGM/Platform/Window/Window.h>
 #include <PGM/Renderer/RenderContext.h>
@@ -57,6 +60,16 @@ class Application
         return m_RenderContext;
     }
 
+    template <typename SystemType, typename... Args> inline void pushSystem(Args &&...args)
+    {
+        m_SystemsStack.push<SystemType>(std::forward<Args>(args)...);
+    }
+
+    inline const SharedRef<Platform::Window> window() const
+    {
+        return m_Window;
+    }
+
     void run();
 
   protected:
@@ -87,14 +100,17 @@ class Application
     }
 
     inline Application(SharedRef<Platform::Window> wnd, Renderer::RenderContext context)
-        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}
+        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}, m_SystemsStack{*this}
     {
         bindEvents();
     }
 
     SharedRef<Platform::Window> m_Window;
+    ApplicationSystemStack m_SystemsStack;
     Renderer::RenderContext m_RenderContext;
     bool m_WindowClosed;
+
+    Time m_LastFrameTime;
 
     std::mutex m_RendererMutex;
     std::vector<Events::EventListener> m_EventListeners;
