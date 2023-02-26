@@ -75,8 +75,9 @@ class Application
 
   protected:
     void onWindowClose(const Platform::WindowEvents::WindowClose &closeEvent);
-    void onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent);
+    void onWindowResized(const Platform::WindowEvents::WindowResized &resizeEvent);
 
+    void onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent);
     void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
     void onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent);
 

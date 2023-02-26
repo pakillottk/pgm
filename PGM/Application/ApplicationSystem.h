@@ -17,6 +17,7 @@ class ApplicationSystem
     }
 
     // IO Handling
+    virtual bool onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent) = 0;
     virtual bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent) = 0;
     virtual bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent) = 0;
 

@@ -39,6 +39,12 @@ namespace detail
         case PGM::Renderer::API::Buffers::UnsignedByte:
             return GL_UNSIGNED_BYTE;
 
+        case PGM::Renderer::API::Buffers::Short:
+            return GL_SHORT;
+
+        case PGM::Renderer::API::Buffers::UnsignedShort:
+            return GL_UNSIGNED_SHORT;
+
         case PGM::Renderer::API::Buffers::Int:
             return GL_INT;
 
@@ -56,20 +62,28 @@ namespace detail
 
     inline void attachVertexAttrib(int id, bool isIndex, const PGM::Renderer::API::Buffers::VertexAttrib &attrib)
     {
-        glBindBuffer(isIndex ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER, attrib.buffer->id());
-        PGM_CHECK_GL();
+        if (isIndex)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, attrib.buffer->id());
+            PGM_CHECK_GL();
+        }
+        else
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, attrib.buffer->id());
 
-        glVertexAttribPointer(attrib.location, static_cast<GLint>(attrib.size), convertDataType(attrib.type), GL_FALSE,
-                              static_cast<GLsizei>(attrib.stride), reinterpret_cast<void *>(attrib.offset));
-        PGM_CHECK_GL();
+            glVertexAttribPointer(attrib.location, static_cast<GLint>(attrib.size), convertDataType(attrib.type),
+                                  attrib.normalize ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(attrib.stride),
+                                  reinterpret_cast<void *>(attrib.offset));
+            PGM_CHECK_GL();
 
-        glEnableVertexArrayAttrib(id, attrib.location);
-        PGM_CHECK_GL();
+            glEnableVertexArrayAttrib(id, attrib.location);
+            PGM_CHECK_GL();
+        }
     }
 
 } // namespace detail
 
-int VertexArrayImpl::genVertexArray(std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) const
+int VertexArrayImpl::genVertexArray(std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers)
 {
     int id = detail::genVertexArray();
     if (id == PGM::Renderer::API::Buffers::NULL_VERTEX_ARRAY_ID)
@@ -86,7 +100,7 @@ int VertexArrayImpl::genVertexArray(std::initializer_list<PGM::Renderer::API::Bu
 }
 
 int VertexArrayImpl::genVertexArray(const PGM::Renderer::API::Buffers::VertexAttrib &indexBuffer,
-                                    std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) const
+                                    std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers)
 {
     int id = detail::genVertexArray();
     if (id == PGM::Renderer::API::Buffers::NULL_VERTEX_ARRAY_ID)
@@ -98,6 +112,7 @@ int VertexArrayImpl::genVertexArray(const PGM::Renderer::API::Buffers::VertexAtt
     detail::attachVertexAttrib(id, true, indexBuffer);
     std::for_each(buffers.begin(), buffers.end(),
                   [id](const auto &attrib) { detail::attachVertexAttrib(id, false, attrib); });
+    m_Attribs.push_back(indexBuffer);
     unbindVertexArray();
 
     return id;

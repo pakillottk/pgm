@@ -9,6 +9,10 @@ struct OpenGlCommands : public Commands
 {
     void clear(ClearBufferMask mask, Color clearColor = Colors::Black) const override;
     void setViewport(const RectInt &viewportRect) const override;
+    void setClipRegion(const RectInt &clipRect) const override;
+
+    void depthTest(bool enable) const override;
+    void blending(bool enable) const override;
 
     SharedRef<Buffers::GpuBuffer> createBuffer(bool dynamic, size_t size, const void *data = nullptr) const override;
 
@@ -24,6 +28,9 @@ struct OpenGlCommands : public Commands
 
     SharedRef<Textures::Texture2d> createTexture2d(Textures::PixelType pixelType, unsigned channelCount, unsigned w,
                                                    unsigned h, const void *data = nullptr) const override;
+
+    void drawIndexed(PrimitiveType primitive, unsigned elements, Buffers::VertexAttribDataType indexType,
+                     size_t offset) const override;
 };
 
 } // namespace PGM::Renderer::API::Backend

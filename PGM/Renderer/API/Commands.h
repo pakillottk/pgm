@@ -19,12 +19,21 @@ enum ClearBufferBits
     bStencil = 0b100
 };
 
+enum PrimitiveType
+{
+    Triangles
+};
+
 using ClearBufferMask = int;
 
 struct Commands
 {
     virtual void clear(ClearBufferMask mask, Color clearColor = Colors::Black) const = 0;
     virtual void setViewport(const RectInt &viewportRect) const = 0;
+    virtual void setClipRegion(const RectInt &clipRect) const = 0;
+
+    virtual void depthTest(bool enable) const = 0;
+    virtual void blending(bool enable) const = 0;
 
     virtual SharedRef<Buffers::GpuBuffer> createBuffer(bool dynamic, size_t size, const void *data = nullptr) const = 0;
 
@@ -40,6 +49,9 @@ struct Commands
     virtual SharedRef<Textures::Texture2d> createTexture2d(Textures::PixelType pixelType, unsigned channelCount,
                                                            unsigned w, unsigned h,
                                                            const void *data = nullptr) const = 0;
+
+    virtual void drawIndexed(PrimitiveType primitive, unsigned elements, Buffers::VertexAttribDataType indexType,
+                             size_t offset) const = 0;
 };
 
 } // namespace PGM::Renderer::API

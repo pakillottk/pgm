@@ -9,6 +9,11 @@ class SandboxSystem : public PGM::ApplicationSystem
     }
 
     // IO Handling
+    bool onMouseMove(const PGM::Platform::WindowEvents::MouseMove &mouseMoveEvent) override
+    {
+        return false;
+    }
+
     bool onMouseDown(const PGM::Platform::WindowEvents::MouseButtonDown &mouseDownEvent) override
     {
         return false;
@@ -41,6 +46,7 @@ class SandboxSystem : public PGM::ApplicationSystem
     {
         const auto window = m_App.window();
         m_App.context()->setViewport({0, 0, window->width(), window->height()});
+        m_App.context()->setClipRegion({0, 0, window->width(), window->height()});
         m_App.context()->clear(PGM::Renderer::API::bColor | PGM::Renderer::API::bDepth, PGM::Color{m_Red, 0, 0, 1});
     }
 

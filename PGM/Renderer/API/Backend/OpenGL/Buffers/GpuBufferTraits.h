@@ -120,7 +120,7 @@ struct OpenGlDynamicBufferTraits final
 
     inline void commit(int id)
     {
-        glNamedBufferData(id, static_cast<GLsizeiptr>(m_Data.size()), m_Data.data(), GL_DYNAMIC_DRAW);
+        glNamedBufferData(id, static_cast<GLsizeiptr>(m_Data.size()), m_Data.data(), GL_STREAM_DRAW);
         PGM_CHECK_GL();
     }
 };

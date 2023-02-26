@@ -42,16 +42,16 @@ static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::P
         switch (channelCount)
         {
         case 1:
-            return GL_R8;
+            return GL_R;
 
         case 2:
-            return GL_RG8;
+            return GL_RG;
 
         case 3:
-            return GL_RGB8;
+            return GL_RGB;
 
         case 4:
-            return GL_RGBA8;
+            return GL_RGBA;
         }
         break;
 
@@ -171,10 +171,10 @@ void OpenGlTexture2d::write(unsigned x, unsigned y, unsigned w, unsigned h, cons
 
 void OpenGlTexture2d::bind(int unit) const
 {
-    glBindTexture(GL_TEXTURE_2D, m_Id);
+    glActiveTexture(GL_TEXTURE0 + unit);
     PGM_CHECK_GL();
 
-    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, m_Id);
     PGM_CHECK_GL();
 }
 

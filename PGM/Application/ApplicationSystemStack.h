@@ -16,10 +16,7 @@ class ApplicationSystemStack final
   public:
     inline ~ApplicationSystemStack()
     {
-        for (auto &system : m_Stack)
-        {
-            system->onDeactivate();
-        }
+        clear();
     }
 
     template <typename SystemType, typename... Args> inline void push(Args &&...args)
@@ -37,6 +34,16 @@ class ApplicationSystemStack final
     inline auto end() noexcept
     {
         return m_Stack.rend();
+    }
+
+    inline void clear()
+    {
+        for (auto &system : m_Stack)
+        {
+            system->onDeactivate();
+        }
+
+        m_Stack.clear();
     }
 
   private:

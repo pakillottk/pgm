@@ -26,13 +26,15 @@ static int createShader(const std::string_view &vertexSource, const std::string_
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
     if (status != GL_TRUE)
     {
-        PGM_ASSERT(status != GL_TRUE, "Vertex Shader compilation failed");
+        PGM_ASSERT(status == GL_TRUE, "Vertex Shader compilation failed");
 
         char buffer[512];
         glGetShaderInfoLog(vertexShader, 512, nullptr, buffer);
         PGM::Logging::log_error("Shader compilation error: {}", buffer);
 
         glDeleteShader(vertexShader);
+
+        return 0;
     }
 
     // Fragment Shader
@@ -43,26 +45,39 @@ static int createShader(const std::string_view &vertexSource, const std::string_
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
     if (status != GL_TRUE)
     {
-        PGM_ASSERT(status != GL_TRUE, "Fragment Shader compilation failed");
+        PGM_ASSERT(status == GL_TRUE, "Fragment Shader compilation failed");
 
         char buffer[512];
         glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
         PGM::Logging::log_error("Shader compilation error: {}", buffer);
 
         glDeleteShader(fragmentShader);
+
+        return 0;
     }
 
     glAttachShader(id, vertexShader);
     glAttachShader(id, fragmentShader);
 
     glLinkProgram(id);
-    // TODO(pgm) Check link status
-
     glValidateProgram(id);
-    // TODO(pgm) Check validation status
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    glGetProgramiv(id, GL_LINK_STATUS, &status);
+    if (status != GL_TRUE)
+    {
+        PGM_ASSERT(status == GL_TRUE, "Program link failed");
+
+        char buffer[512];
+        glGetProgramInfoLog(id, 512, NULL, buffer);
+        PGM::Logging::log_error("Shader compilation error: {}", buffer);
+
+        glDeleteProgram(id);
+
+        return 0;
+    }
 
     PGM_CHECK_GL();
 

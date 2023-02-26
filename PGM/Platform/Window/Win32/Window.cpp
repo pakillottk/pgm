@@ -10,6 +10,7 @@
 #include <tuple>
 
 #include <Windows.h>
+#include <Windowsx.h>
 
 #define internal static
 
@@ -273,8 +274,16 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         // Resized
         UINT width = LOWORD(lParam);
         UINT height = HIWORD(lParam);
-        dispatcher->emplace_dispatch<WindowEvents::WindowResizedEvent>(static_cast<int>(width),
-                                                                       static_cast<int>(height));
+        dispatcher->emplace_dispatch<WindowEvents::WindowResized>(static_cast<int>(width), static_cast<int>(height));
+        Result = DefWindowProcW(window, message, wParam, lParam);
+    }
+    break;
+
+    case WM_MOUSEMOVE: {
+        const auto x = GET_X_LPARAM(lParam);
+        const auto y = GET_Y_LPARAM(lParam);
+
+        dispatcher->emplace_dispatch<WindowEvents::MouseMove>(Vec2{static_cast<float>(x), static_cast<float>(y)});
         Result = DefWindowProcW(window, message, wParam, lParam);
     }
     break;
@@ -288,7 +297,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
     case WM_LBUTTONUP: {
-        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseLeft);
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonUp>(Input::MouseLeft);
     }
     break;
 
@@ -301,7 +310,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
     case WM_MBUTTONUP: {
-        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseMiddle);
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonUp>(Input::MouseMiddle);
     }
     break;
 
@@ -314,7 +323,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
     case WM_RBUTTONUP: {
-        dispatcher->emplace_dispatch<WindowEvents::MouseButtonDown>(Input::MouseRight);
+        dispatcher->emplace_dispatch<WindowEvents::MouseButtonUp>(Input::MouseRight);
     }
     break;
 
@@ -413,9 +422,9 @@ RectInt Window::rect() const
 
     RECT rect;
 #ifdef PGM_ASSERTS_ENABLED
-    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+    PGM_ASSERT(GetClientRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect);
+    GetClientRect(m_Impl->window_handle, &rect);
 #endif
 
     return RectInt{static_cast<int>(rect.left), static_cast<int>(rect.bottom), static_cast<int>(rect.right - rect.left),
@@ -428,9 +437,9 @@ int Window::width() const
 
     RECT rect;
 #ifdef PGM_ASSERTS_ENABLED
-    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+    PGM_ASSERT(GetClientRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect);
+    GetClientRect(m_Impl->window_handle, &rect);
 #endif
 
     return static_cast<int>(rect.right - rect.left);
@@ -442,9 +451,9 @@ int Window::height() const
 
     RECT rect;
 #ifdef PGM_ASSERTS_ENABLED
-    PGM_ASSERT(GetWindowRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
+    PGM_ASSERT(GetClientRect(m_Impl->window_handle, &rect) == TRUE, "Windows API call failed");
 #else
-    GetWindowRect(m_Impl->window_handle, &rect);
+    GetClientRect(m_Impl->window_handle, &rect);
 #endif
 
     return static_cast<int>(rect.bottom - rect.top);

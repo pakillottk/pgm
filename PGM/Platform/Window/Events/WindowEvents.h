@@ -6,7 +6,7 @@
 namespace PGM::Platform::WindowEvents
 {
 
-struct WindowResizedEvent final
+struct WindowResized final
 {
     int width;
     int height;
@@ -20,6 +20,11 @@ struct WindowKeyDown final
 struct WindowKeyUp final
 {
     Input::Key key;
+};
+
+struct MouseMove final
+{
+    Vec2 location;
 };
 
 struct MouseButtonDown final

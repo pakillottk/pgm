@@ -30,6 +30,8 @@ enum VertexAttribDataType
 {
     Byte,
     UnsignedByte,
+    Short,
+    UnsignedShort,
     Int,
     Uint,
     Float
@@ -43,6 +45,7 @@ struct VertexAttrib
     unsigned size;
     size_t stride;
     size_t offset;
+    bool normalize = false;
 };
 
 static constexpr int NULL_VERTEX_ARRAY_ID = -1;
@@ -79,16 +82,15 @@ class VertexArray
 
   protected:
     int m_Id;
+    bool m_Indexed;
+    std::vector<VertexAttrib> m_Attribs;
 
-    virtual int genVertexArray(std::initializer_list<VertexAttrib> buffers) const = 0;
-    virtual int genVertexArray(const VertexAttrib &indexBuffer, std::initializer_list<VertexAttrib> buffers) const = 0;
+    virtual int genVertexArray(std::initializer_list<VertexAttrib> buffers) = 0;
+    virtual int genVertexArray(const VertexAttrib &indexBuffer, std::initializer_list<VertexAttrib> buffers) = 0;
     virtual void bindVertexArray(int id) const = 0;
     virtual void unbindVertexArray() const = 0;
 
   private:
-    bool m_Indexed;
-    std::vector<VertexAttrib> m_Attribs;
-
     static inline void commitVertexAttrib(const VertexAttrib &attrib)
     {
         attrib.buffer->commit();

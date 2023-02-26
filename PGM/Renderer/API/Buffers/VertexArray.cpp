@@ -10,7 +10,6 @@ VertexArray::VertexArray(std::initializer_list<VertexAttrib> buffers) : m_Attrib
 VertexArray::VertexArray(const VertexAttrib &indexBuffer, std::initializer_list<VertexAttrib> buffers)
     : m_Attribs{buffers}, m_Indexed{true}
 {
-    m_Attribs.push_back(indexBuffer);
 }
 
 VertexArray::~VertexArray()

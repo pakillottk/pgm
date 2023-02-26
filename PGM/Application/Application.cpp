@@ -75,11 +75,32 @@ void Application::onWindowClose([[maybe_unused]] const Platform::WindowEvents::W
 {
     m_WindowClosed = true;
     Logging::log_debug("Window closed");
+
+    m_RenderContext.bind();
+    m_GUI.onDeactivate();
+    m_SystemsStack.clear();
+    m_RenderContext.unbind();
 }
 
-void Application::onWindowResized(const Platform::WindowEvents::WindowResizedEvent &resizeEvent)
+void Application::onWindowResized(const Platform::WindowEvents::WindowResized &resizeEvent)
 {
     Logging::log_debug("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
+}
+
+void Application::onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent)
+{
+    if (m_GUI.onMouseMove(mouseMoveEvent))
+    {
+        return;
+    }
+
+    for (auto &system : m_SystemsStack)
+    {
+        if (system->onMouseMove(mouseMoveEvent))
+        {
+            break;
+        }
+    }
 }
 
 void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent)
@@ -160,9 +181,11 @@ void Application::bindEvents()
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowClose>(
         [this](const auto &event) { this->onWindowClose(event); }));
 
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowResizedEvent>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowResized>(
         [this](const auto &event) { this->onWindowResized(event); }));
 
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseMove>(
+        [this](const auto &event) { this->onMouseMove(event); }));
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseButtonDown>(
         [this](const auto &event) { this->onMouseDown(event); }));
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseButtonUp>(

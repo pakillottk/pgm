@@ -41,6 +41,11 @@ internal inline void configureOpenGlContext()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_PRIMITIVE_RESTART);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlContextFlagCreationMask flags)

@@ -22,10 +22,10 @@ class VertexArrayImpl final : public PGM::Renderer::API::Buffers::VertexArray
     }
 
   protected:
-    int genVertexArray(std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) const override;
+    int genVertexArray(std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) override;
 
     int genVertexArray(const PGM::Renderer::API::Buffers::VertexAttrib &indexBuffer,
-                       std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) const override;
+                       std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers) override;
 
     void bindVertexArray(int id) const override;
 
