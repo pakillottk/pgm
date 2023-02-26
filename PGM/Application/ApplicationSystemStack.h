@@ -14,22 +14,18 @@ class Application;
 class ApplicationSystemStack final
 {
   public:
-    inline ApplicationSystemStack(const Application &app) : m_App(app)
-    {
-    }
-
     inline ~ApplicationSystemStack()
     {
         for (auto &system : m_Stack)
         {
-            system->onDeactivate(m_App);
+            system->onDeactivate();
         }
     }
 
     template <typename SystemType, typename... Args> inline void push(Args &&...args)
     {
         auto system = make_shared_ref<SystemType>(std::forward<Args>(args)...);
-        system->onActivate(m_App);
+        system->onActivate();
         m_Stack.push_back(system);
     }
 
@@ -44,7 +40,6 @@ class ApplicationSystemStack final
     }
 
   private:
-    const Application &m_App;
     std::vector<SharedRef<ApplicationSystem>> m_Stack;
 };
 

@@ -62,7 +62,7 @@ class Application
 
     template <typename SystemType, typename... Args> inline void pushSystem(Args &&...args)
     {
-        m_SystemsStack.push<SystemType>(std::forward<Args>(args)...);
+        m_SystemsStack.push<SystemType>(*this, std::forward<Args>(args)...);
     }
 
     inline const SharedRef<Platform::Window> window() const
@@ -100,7 +100,7 @@ class Application
     }
 
     inline Application(SharedRef<Platform::Window> wnd, Renderer::RenderContext context)
-        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}, m_SystemsStack{*this}
+        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}
     {
         bindEvents();
     }

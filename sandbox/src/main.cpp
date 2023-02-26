@@ -4,6 +4,10 @@
 class SandboxSystem : public PGM::ApplicationSystem
 {
   public:
+    constexpr SandboxSystem(const PGM::Application &app) : PGM::ApplicationSystem(app)
+    {
+    }
+
     // IO Handling
     bool onMouseDown(const PGM::Platform::WindowEvents::MouseButtonDown &mouseDownEvent) override
     {
@@ -24,27 +28,27 @@ class SandboxSystem : public PGM::ApplicationSystem
     }
 
     // Life cycle
-    void onActivate(const PGM::Application &app) override
+    void onActivate() override
     {
     }
 
-    void onDeactivate(const PGM::Application &app) override
+    void onDeactivate() override
     {
     }
 
     // Actual logic
-    void beginFrame(const PGM::Application &app) override
+    void beginFrame() override
     {
-        const auto window = app.window();
-        app.context()->setViewport({0, 0, window->width(), window->height()});
-        app.context()->clear(PGM::Renderer::API::bColor | PGM::Renderer::API::bDepth, PGM::Color{m_Red, 0, 0, 1});
+        const auto window = m_App.window();
+        m_App.context()->setViewport({0, 0, window->width(), window->height()});
+        m_App.context()->clear(PGM::Renderer::API::bColor | PGM::Renderer::API::bDepth, PGM::Color{m_Red, 0, 0, 1});
     }
 
-    void endFrame(const PGM::Application &app) override
+    void endFrame() override
     {
     }
 
-    void onUpdate(const PGM::Application &app, const PGM::Timespan &deltaTime) override
+    void onUpdate(const PGM::Timespan &deltaTime) override
     {
         if (m_Red < 1.0f)
         {

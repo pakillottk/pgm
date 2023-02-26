@@ -12,6 +12,10 @@ class Application;
 class ApplicationSystem
 {
   public:
+    constexpr ApplicationSystem(const Application &app) : m_App(app)
+    {
+    }
+
     // IO Handling
     virtual bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent) = 0;
     virtual bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent) = 0;
@@ -20,13 +24,16 @@ class ApplicationSystem
     virtual bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent) = 0;
 
     // Life cycle
-    virtual void onActivate(const Application &app) = 0;
-    virtual void onDeactivate(const Application &app) = 0;
+    virtual void onActivate() = 0;
+    virtual void onDeactivate() = 0;
 
     // Actual logic
-    virtual void beginFrame(const Application &app) = 0;
-    virtual void endFrame(const Application &app) = 0;
-    virtual void onUpdate(const Application &app, const Timespan &deltaTime) = 0;
+    virtual void beginFrame() = 0;
+    virtual void endFrame() = 0;
+    virtual void onUpdate(const Timespan &deltaTime) = 0;
+
+  protected:
+    const Application &m_App;
 };
 
 } // namespace PGM

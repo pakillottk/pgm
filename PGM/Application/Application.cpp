@@ -42,17 +42,17 @@ void Application::run()
 
         for (auto &system : m_SystemsStack)
         {
-            system->beginFrame(*this);
+            system->beginFrame();
         }
 
         for (auto &system : m_SystemsStack)
         {
-            system->onUpdate(*this, deltaTime);
+            system->onUpdate(deltaTime);
         }
 
         for (auto &system : m_SystemsStack)
         {
-            system->endFrame(*this);
+            system->endFrame();
         }
 
         m_RenderContext.swapBuffers();
