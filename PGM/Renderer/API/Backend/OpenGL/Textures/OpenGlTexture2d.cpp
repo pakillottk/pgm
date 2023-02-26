@@ -12,7 +12,7 @@
 namespace PGM::Renderer::API::Backend::OpenGL::Textures
 {
 
-static constexpr GLenum mapInternalFormat(unsigned channelCount)
+static constexpr GLenum mapInputFormat(unsigned channelCount)
 {
     switch (channelCount)
     {
@@ -33,7 +33,8 @@ static constexpr GLenum mapInternalFormat(unsigned channelCount)
     }
 }
 
-static constexpr GLenum mapPixelFormat(PGM::Renderer::API::Textures::PixelType pixelType, unsigned channelCount)
+static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::PixelType pixelType,
+                                                 unsigned channelCount)
 {
     switch (pixelType)
     {
@@ -96,7 +97,7 @@ static constexpr GLenum mapPixelFormat(PGM::Renderer::API::Textures::PixelType p
     return 0;
 }
 
-static constexpr GLenum mapType(PGM::Renderer::API::Textures::PixelType pixelType)
+static constexpr GLenum mapPixelDataType(PGM::Renderer::API::Textures::PixelType pixelType)
 {
     switch (pixelType)
     {
@@ -142,9 +143,9 @@ OpenGlTexture2d::OpenGlTexture2d(PGM::Renderer::API::Textures::PixelType pixelTy
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     PGM_CHECK_GL();
 
-    const auto internalFormat = mapInternalFormat(channelCount);
-    const auto format = mapPixelFormat(pixelType, channelCount);
-    const auto type = mapType(pixelType);
+    const auto internalFormat = mapTextureInternalFormat(pixelType, channelCount);
+    const auto format = mapInputFormat(channelCount);
+    const auto type = mapPixelDataType(pixelType);
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, data);
     PGM_CHECK_GL();
 
@@ -161,8 +162,7 @@ void OpenGlTexture2d::write(unsigned x, unsigned y, unsigned w, unsigned h, cons
     glBindTexture(GL_TEXTURE_2D, m_Id);
     PGM_CHECK_GL();
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, mapPixelFormat(m_PixelType, m_ChannelCount), mapType(m_PixelType),
-                    data);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, mapInputFormat(m_ChannelCount), mapPixelDataType(m_PixelType), data);
     PGM_CHECK_GL();
 
     glBindTexture(GL_TEXTURE_2D, 0);
