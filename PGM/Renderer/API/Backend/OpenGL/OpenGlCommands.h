@@ -21,6 +21,9 @@ struct OpenGlCommands : public Commands
 
     SharedRef<Shaders::Shader> createShader(const std::string_view &vertexSource,
                                             const std::string_view &fragmentSource) const override;
+
+    SharedRef<Textures::Texture2d> createTexture2d(Textures::PixelType pixelType, unsigned channelCount, unsigned w,
+                                                   unsigned h, const void *data = nullptr) const override;
 };
 
 } // namespace PGM::Renderer::API::Backend

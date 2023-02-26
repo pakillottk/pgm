@@ -3,6 +3,9 @@
 #include <PGM/Core/Logging/Logger.h>
 #include <PGM/Renderer/API/Backends.h>
 
+#include <array>
+#include <cstddef>
+
 // Force dedicated GPU
 extern "C"
 {
@@ -87,6 +90,13 @@ void Application::run()
         shader->bind();
         shader->unbind();
         shader->destroy();
+
+        static const int pixel = 0xff0000ff;
+        auto texture = m_RenderContext->createTexture2d(PGM::Renderer::API::Textures::Byte, 4, 1, 1, &pixel);
+        texture->write(0, 0, 1, 1, &pixel);
+        texture->bind(0);
+        texture->unbind();
+        texture->destroy();
 
         Color clearColor{t, t, t, 1.0f};
         m_RenderContext->clear(Renderer::API::bColor | Renderer::API::bDepth, clearColor);

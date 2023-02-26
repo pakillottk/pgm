@@ -4,6 +4,7 @@
 #include "Buffers/VertexArrayImpl.h"
 #include "GlCheck.h"
 #include "Shaders/OpenGlShader.h"
+#include "Textures/OpenGlTexture2d.h"
 
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Logging/Logger.h>
@@ -86,6 +87,13 @@ SharedRef<Shaders::Shader> OpenGlCommands::createShader(const std::string_view &
                                                         const std::string_view &fragmentSource) const
 {
     return make_shared_ref<OpenGL::Shaders::OpenGlShader>(vertexSource, fragmentSource);
+}
+
+SharedRef<Textures::Texture2d> OpenGlCommands::createTexture2d(Textures::PixelType pixelType, unsigned channelCount,
+                                                               unsigned w, unsigned h,
+                                                               const void *data /*= nullptr*/) const
+{
+    return make_shared_ref<Backend::OpenGL::Textures::OpenGlTexture2d>(pixelType, channelCount, w, h, data);
 }
 
 } // namespace PGM::Renderer::API::Backend
