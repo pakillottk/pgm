@@ -18,6 +18,6 @@ endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 set(GLEW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glew/include)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/PGM)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sandbox)

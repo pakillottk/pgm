@@ -22,6 +22,11 @@ void Application::run()
 
     m_LastFrameTime = Timer::now();
 
+    // Initialize GUI
+    m_RenderContext.bind();
+    m_GUI.onActivate();
+    m_RenderContext.unbind();
+
     while (m_Window->pumpMessages())
     {
         if (m_WindowClosed)
@@ -40,6 +45,8 @@ void Application::run()
         const Timespan deltaTime{m_LastFrameTime, time};
         m_LastFrameTime = time;
 
+        m_GUI.beginFrame();
+
         for (auto &system : m_SystemsStack)
         {
             system->beginFrame();
@@ -50,10 +57,14 @@ void Application::run()
             system->onUpdate(deltaTime);
         }
 
+        m_GUI.onUpdate(deltaTime);
+
         for (auto &system : m_SystemsStack)
         {
             system->endFrame();
         }
+
+        m_GUI.endFrame();
 
         m_RenderContext.swapBuffers();
         m_RenderContext.unbind();
@@ -76,6 +87,11 @@ void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mou
     Logging::log_debug("Mouse button pressed: {} (Double clicked: {})", mouseDownEvent.button,
                        mouseDownEvent.isDoubleClick);
 
+    if (m_GUI.onMouseDown(mouseDownEvent))
+    {
+        return;
+    }
+
     for (auto &system : m_SystemsStack)
     {
         if (system->onMouseDown(mouseDownEvent))
@@ -88,6 +104,11 @@ void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mou
 void Application::onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent)
 {
     Logging::log_debug("Mouse button released: {}", mouseUpEvent.button);
+
+    if (m_GUI.onMouseUp(mouseUpEvent))
+    {
+        return;
+    }
 
     for (auto &system : m_SystemsStack)
     {
@@ -102,6 +123,11 @@ void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDown
 {
     Logging::log_debug("Key pressed: {}", keyDownEvent.key);
 
+    if (m_GUI.onKeyDown(keyDownEvent))
+    {
+        return;
+    }
+
     for (auto &system : m_SystemsStack)
     {
         if (system->onKeyDown(keyDownEvent))
@@ -114,6 +140,11 @@ void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDown
 void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
 {
     Logging::log_debug("Key released: {}", keyUpEvent.key);
+
+    if (m_GUI.onKeyUp(keyUpEvent))
+    {
+        return;
+    }
 
     for (auto &system : m_SystemsStack)
     {

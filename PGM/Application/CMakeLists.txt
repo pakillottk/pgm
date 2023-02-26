@@ -18,6 +18,7 @@ endif()
 set(
     SOURCES 
     ${CMAKE_CURRENT_SOURCE_DIR}/Application.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/GUI/GUISystem.cpp
 )
 
 # platform specific

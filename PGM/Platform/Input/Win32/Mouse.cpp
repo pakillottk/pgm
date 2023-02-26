@@ -1,4 +1,5 @@
 #include "../Mouse.h"
+#include "../../Window/Win32/WindowImpl.h"
 
 #include <PGM/Core/Assert/Assert.h>
 
@@ -21,6 +22,17 @@ bool isMouseButtonDown(MouseButton button)
         PGM_ASSERT(false, "Invalid mouse button");
         return false;
     }
+}
+
+Vec2 mousePosition(const Window &wnd)
+{
+    POINT pos;
+    if (::GetCursorPos(&pos) && ::ScreenToClient(wnd.impl().window_handle, &pos))
+    {
+        return Vec2{static_cast<float>(pos.x), static_cast<float>(pos.y)};
+    }
+
+    return Vec2{};
 }
 
 } // namespace PGM::Platform::Input

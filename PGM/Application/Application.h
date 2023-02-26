@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ApplicationSystemStack.h"
+#include "GUI/GUISystem.h"
 
 #include <PGM/Core/Assert/Assert.h>
 #include <PGM/Core/Ref/Ref.h>
@@ -100,12 +101,13 @@ class Application
     }
 
     inline Application(SharedRef<Platform::Window> wnd, Renderer::RenderContext context)
-        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}
+        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}, m_GUI(*this)
     {
         bindEvents();
     }
 
     SharedRef<Platform::Window> m_Window;
+    GUI::GUISystem m_GUI;
     ApplicationSystemStack m_SystemsStack;
     Renderer::RenderContext m_RenderContext;
     bool m_WindowClosed;
