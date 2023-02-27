@@ -15,6 +15,7 @@ struct WindowResized final
 struct WindowKeyDown final
 {
     Input::Key key;
+    bool repeat;
 };
 
 struct WindowKeyUp final

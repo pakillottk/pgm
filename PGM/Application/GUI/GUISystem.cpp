@@ -609,7 +609,11 @@ bool GUISystem::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEv
         return false;
     }
 
-    io.AddKeyEvent(convertToImGuiKey(keyDownEvent.key), true);
+    if (!keyDownEvent.repeat)
+    {
+        io.AddKeyEvent(convertToImGuiKey(keyDownEvent.key), true);
+    }
+
     return true;
 }
 
@@ -663,6 +667,7 @@ void GUISystem::endFrame()
 
 void GUISystem::onUpdate(const Timespan &deltaTime)
 {
+    ImGui::GetIO().DeltaTime = deltaTime.seconds();
     ImGui::ShowDemoWindow();
 }
 

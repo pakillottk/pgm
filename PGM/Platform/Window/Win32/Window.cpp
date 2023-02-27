@@ -332,7 +332,8 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         PGM_ASSERT(dispatcher != nullptr, "Window EventDispatcher not set");
 
         const auto key = vkeyToPgmKey(wParam, lParam);
-        dispatcher->emplace_dispatch<WindowEvents::WindowKeyDown>(key);
+        bool repeat = (HIWORD(lParam) & KF_REPEAT) != 0;
+        dispatcher->emplace_dispatch<WindowEvents::WindowKeyDown>(key, repeat);
     }
     break;
 

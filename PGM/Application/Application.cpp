@@ -142,7 +142,7 @@ void Application::onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUp
 
 void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
 {
-    Logging::log_debug("Key pressed: {}", keyDownEvent.key);
+    Logging::log_debug("Key pressed: {} repeat={}", keyDownEvent.key, keyDownEvent.repeat);
 
     if (m_GUI.onKeyDown(keyDownEvent))
     {
