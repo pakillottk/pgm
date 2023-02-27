@@ -52,6 +52,8 @@ struct Commands
 
     virtual void drawIndexed(PrimitiveType primitive, unsigned elements, Buffers::VertexAttribDataType indexType,
                              size_t offset) const = 0;
+
+    virtual void draw(PrimitiveType primitive, unsigned vertexCount, size_t offset) const = 0;
 };
 
 } // namespace PGM::Renderer::API

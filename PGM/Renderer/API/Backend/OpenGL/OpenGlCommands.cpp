@@ -180,4 +180,10 @@ void OpenGlCommands::drawIndexed(PrimitiveType primitive, unsigned elements, Buf
     PGM_CHECK_GL();
 }
 
+void OpenGlCommands::draw(PrimitiveType primitive, unsigned vertexCount, size_t offset) const
+{
+    glDrawArrays(mapPrimitiveType(primitive), static_cast<GLint>(offset), static_cast<GLint>(vertexCount));
+    PGM_CHECK_GL();
+}
+
 } // namespace PGM::Renderer::API::Backend

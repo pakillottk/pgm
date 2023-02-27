@@ -17,21 +17,50 @@ class ApplicationSystem
     }
 
     // IO Handling
-    virtual bool onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent) = 0;
-    virtual bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent) = 0;
-    virtual bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent) = 0;
+    inline virtual bool onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent)
+    {
+        return false;
+    }
+    inline virtual bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent)
+    {
+        return false;
+    }
 
-    virtual bool onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent) = 0;
-    virtual bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent) = 0;
+    inline virtual bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent)
+    {
+        return false;
+    }
+
+    inline virtual bool onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
+    {
+        return false;
+    }
+
+    inline virtual bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
+    {
+        return false;
+    }
 
     // Life cycle
-    virtual void onActivate() = 0;
-    virtual void onDeactivate() = 0;
+    virtual void onActivate()
+    {
+    }
+    virtual void onDeactivate()
+    {
+    }
 
     // Actual logic
-    virtual void beginFrame() = 0;
-    virtual void endFrame() = 0;
-    virtual void onUpdate(const Timespan &deltaTime) = 0;
+    virtual void beginFrame()
+    {
+    }
+    
+    virtual void endFrame()
+    {
+    }
+
+    virtual void onUpdate(const Timespan &deltaTime)
+    {
+    }
 
   protected:
     const Application &m_App;

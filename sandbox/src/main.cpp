@@ -1,44 +1,19 @@
 #include <PGM/Application/Application.h>
+#include <PGM/ECS/Components/Components.h>
+#include <PGM/ECS/Entity/EntityRef.h>
+#include <PGM/ECS/Scene/Scene.h>
 #include <PGM/Renderer/API/Backends.h>
+
+#include <imgui/imgui.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 class SandboxSystem : public PGM::ApplicationSystem
 {
   public:
-    constexpr SandboxSystem(const PGM::Application &app) : PGM::ApplicationSystem(app)
+    inline SandboxSystem(const PGM::Application &app) : PGM::ApplicationSystem(app)
     {
-    }
-
-    // IO Handling
-    bool onMouseMove(const PGM::Platform::WindowEvents::MouseMove &mouseMoveEvent) override
-    {
-        return false;
-    }
-
-    bool onMouseDown(const PGM::Platform::WindowEvents::MouseButtonDown &mouseDownEvent) override
-    {
-        return false;
-    }
-    bool onMouseUp(const PGM::Platform::WindowEvents::MouseButtonUp &mouseUpEvent) override
-    {
-        return false;
-    }
-
-    bool onKeyDown(const PGM::Platform::WindowEvents::WindowKeyDown &keyDownEvent) override
-    {
-        return false;
-    }
-    bool onKeyUp(const PGM::Platform::WindowEvents::WindowKeyUp &keyUpEvent) override
-    {
-        return false;
-    }
-
-    // Life cycle
-    void onActivate() override
-    {
-    }
-
-    void onDeactivate() override
-    {
+        m_Scene.createEntity("Entity 1");
+        m_Scene.createEntity("Entity 2");
     }
 
     // Actual logic
@@ -62,9 +37,19 @@ class SandboxSystem : public PGM::ApplicationSystem
             m_Red += deltaRed;
             m_Red = std::min(m_Red, 1.0f);
         }
+
+        if (ImGui::Begin("Scene"))
+        {
+            m_Scene.for_each([](PGM::ECS::EntityRef entity) {
+                auto &tag = entity.getComponent<PGM::ECS::Components::TagComponent>();
+                ImGui::Selectable(tag.name.c_str());
+            });
+        }
+        ImGui::End();
     }
 
   private:
+    PGM::ECS::Scene m_Scene;
     float m_Red{0.0f};
 };
 

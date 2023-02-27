@@ -31,6 +31,8 @@ struct OpenGlCommands : public Commands
 
     void drawIndexed(PrimitiveType primitive, unsigned elements, Buffers::VertexAttribDataType indexType,
                      size_t offset) const override;
+
+    void draw(PrimitiveType primitive, unsigned vertexCount, size_t offset) const override;
 };
 
 } // namespace PGM::Renderer::API::Backend

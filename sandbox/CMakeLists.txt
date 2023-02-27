@@ -15,6 +15,7 @@ target_link_libraries(
 
   PRIVATE 
     pgm::application
+    pgm::ecs
 )
 
 if(MSVC)
