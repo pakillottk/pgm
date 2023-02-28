@@ -311,6 +311,21 @@ void GUISystem::onActivate()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
+    // TODO(pgm) These flags are not correct for all the platforms, but for now we only support win32...
+    auto &io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
+
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    io.BackendFlags |=
+        ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
+    io.BackendFlags |=
+        ImGuiBackendFlags_PlatformHasViewports; // We can create multi-viewports on the Platform side (optional)
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can call io.AddMouseViewportEvent() with correct
+                                                                  // data (optional)
+
+    ImGuiViewport *mainViewport = ImGui::GetMainViewport();
+    mainViewport->PlatformHandle = m_App.window().get();
+
     m_RenderData = GUI::initializeRenderData(m_App.context());
 
     ImGui::StyleColorsDark();
