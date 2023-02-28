@@ -346,6 +346,27 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     }
     break;
 
+    case WM_CHAR: {
+#ifndef UNICODE
+        PGM_ASSERT(false, "Win32 should use Unicode API!");
+#endif
+        if (wParam > 0 && wParam < 0x10000)
+        {
+            wchar_t chars[2] = {(wchar_t)wParam, NULL};
+            int utf8len = WideCharToMultiByte(CP_UTF8, 0, chars, 1, NULL, 0, NULL, NULL);
+
+            std::string utf8;
+            utf8.resize(utf8len);
+
+            ::WideCharToMultiByte(CP_UTF8, 0, chars, 1, &utf8[0], utf8len, 0, 0);
+
+            dispatcher->emplace_dispatch<WindowEvents::WindowTextInput>(std::move(utf8));
+        }
+
+        Result = DefWindowProcW(window, message, wParam, lParam);
+    }
+    break;
+
     case WM_CLOSE: {
         dispatcher->emplace_dispatch<WindowEvents::WindowClose>();
         Result = DefWindowProcW(window, message, wParam, lParam);

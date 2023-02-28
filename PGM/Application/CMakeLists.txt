@@ -36,6 +36,7 @@ target_link_libraries(
     pgm::core 
     pgm::platform
     pgm::renderer
+    pgm::gui
 )
 
 if(MSVC)

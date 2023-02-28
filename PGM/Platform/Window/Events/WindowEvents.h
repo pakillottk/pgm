@@ -23,6 +23,11 @@ struct WindowKeyUp final
     Input::Key key;
 };
 
+struct WindowTextInput final
+{
+    std::string input;
+};
+
 struct MouseMove final
 {
     Vec2 location;

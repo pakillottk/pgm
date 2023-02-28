@@ -83,6 +83,7 @@ class Application
 
     void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
     void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
+    void onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent);
 
   private:
     void bindEvents();

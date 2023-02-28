@@ -6,6 +6,8 @@
 #include <PGM/Renderer/API/Shaders/Shader.h>
 #include <PGM/Renderer/API/Textures/Texture2d.h>
 
+#include <PGM/GUI/GUI.h>
+
 namespace PGM::GUI
 {
 
@@ -23,6 +25,7 @@ class GUISystem : public ApplicationSystem
 
     bool onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent) override;
     bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent) override;
+    bool onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent) override;
 
     // Life cycle
     void onActivate() override;
@@ -33,23 +36,8 @@ class GUISystem : public ApplicationSystem
     void endFrame() override;
     void onUpdate(const Timespan &deltaTime) override;
 
-    struct RenderData
-    {
-        SharedRef<PGM::Renderer::API::Shaders::Shader> shader;
-
-        SharedRef<PGM::Renderer::API::Textures::Texture2d> fontAtlas;
-
-        SharedRef<PGM::Renderer::API::Buffers::GpuBuffer> vertices;
-        SharedRef<PGM::Renderer::API::Buffers::GpuBuffer> indices;
-
-        SharedRef<PGM::Renderer::API::Buffers::VertexArray> vao;
-
-        int projMatLoc;
-        int textSamplerLoc;
-    };
-
   private:
-    RenderData m_RenderData;
+    GUI::RenderData m_RenderData;
 };
 
 } // namespace PGM::GUI

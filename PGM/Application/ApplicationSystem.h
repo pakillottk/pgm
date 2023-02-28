@@ -41,6 +41,11 @@ class ApplicationSystem
         return false;
     }
 
+    inline virtual bool onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent)
+    {
+        return false;
+    }
+
     // Life cycle
     virtual void onActivate()
     {
@@ -53,7 +58,7 @@ class ApplicationSystem
     virtual void beginFrame()
     {
     }
-    
+
     virtual void endFrame()
     {
     }

@@ -176,6 +176,24 @@ void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
     }
 }
 
+void Application::onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent)
+{
+    Logging::log_debug("Text input received: {}", textInputEvent.input);
+
+    if (m_GUI.onTextInput(textInputEvent))
+    {
+        return;
+    }
+
+    for (auto &system : m_SystemsStack)
+    {
+        if (system->onTextInput(textInputEvent))
+        {
+            break;
+        }
+    }
+}
+
 void Application::bindEvents()
 {
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowClose>(
@@ -195,6 +213,8 @@ void Application::bindEvents()
         [this](const auto &event) { this->onKeyDown(event); }));
     m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowKeyUp>(
         [this](const auto &event) { this->onKeyUp(event); }));
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowTextInput>(
+        [this](const auto &event) { this->onTextInput(event); }));
 }
 
 } // namespace PGM

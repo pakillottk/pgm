@@ -1,5 +1,6 @@
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ECS)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/GUI)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Platform)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Renderer)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Application)

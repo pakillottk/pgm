@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.14)
-project(renderer)
+project(gui)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -14,23 +14,16 @@ if (WIN32)
   add_compile_definitions(UNICODE)
 endif()
 
-find_package(OpenGL REQUIRED)
-
 # platform agnostic
 set(
     SOURCES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Buffers/VertexArray.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/OpenGlCommands.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Buffers/VertexArrayImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Shaders/OpenGlShader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Textures/OpenGlTexture2d.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/GUI.cpp
 )
 
 # platform specific
 if (WIN32)
   set(
     PLATFORM_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/API/Backend/OpenGL/Win32/OpenGlRenderContext.cpp
   )
 endif()
 
@@ -41,10 +34,7 @@ target_link_libraries(
   PUBLIC 
     pgm::core 
     pgm::platform
-
-  PRIVATE
-    ${OPENGL_LIBRARIES}
-    glew_s
+    pgm::renderer
 )
 
 if(MSVC)
