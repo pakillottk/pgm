@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PGM::Platform::Input
+namespace PGM::Input
 {
 
 enum Key
@@ -113,4 +113,4 @@ enum Key
 
 bool isKeyDown(Key key);
 
-} // namespace PGM::Platform::Input
+} // namespace PGM::Input

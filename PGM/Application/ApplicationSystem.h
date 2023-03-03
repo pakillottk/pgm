@@ -1,8 +1,8 @@
 #pragma once
 
-#include <PGM/Core/Time/Time.h>
-#include <PGM/Platform/Window/Events/WindowEvents.h>
-#include <PGM/Platform/Window/Window.h>
+#include "../Core/Time/Time.h"
+#include "../Platform/Window/Events/WindowEvents.h"
+#include "../Platform/Window/Window.h"
 
 namespace PGM
 {
@@ -12,36 +12,36 @@ class Application;
 class ApplicationSystem
 {
   public:
-    constexpr ApplicationSystem(const Application &app) : m_App(app)
+    constexpr ApplicationSystem(Application &app) : m_App(app)
     {
     }
 
     // IO Handling
-    inline virtual bool onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent)
+    inline virtual bool onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent)
     {
         return false;
     }
-    inline virtual bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent)
-    {
-        return false;
-    }
-
-    inline virtual bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent)
+    inline virtual bool onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent)
     {
         return false;
     }
 
-    inline virtual bool onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
+    inline virtual bool onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent)
     {
         return false;
     }
 
-    inline virtual bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
+    inline virtual bool onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent)
     {
         return false;
     }
 
-    inline virtual bool onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent)
+    inline virtual bool onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent)
+    {
+        return false;
+    }
+
+    inline virtual bool onTextInput(const WindowEvents::WindowTextInput &textInputEvent)
     {
         return false;
     }
@@ -68,7 +68,7 @@ class ApplicationSystem
     }
 
   protected:
-    const Application &m_App;
+    Application &m_App;
 };
 
 } // namespace PGM

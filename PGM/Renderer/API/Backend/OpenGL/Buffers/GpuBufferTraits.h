@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace PGM::Renderer::API::Backend::OpenGL::Buffers
+namespace PGM::OpenGL
 {
 
 namespace detail
@@ -26,7 +26,7 @@ namespace detail
         PGM_CHECK_GL();
         if (id == 0)
         {
-            return PGM::Renderer::API::Buffers::NULL_BUFFER_ID;
+            return PGM::NULL_BUFFER_ID;
         }
         glBindBuffer(GL_ARRAY_BUFFER, id);
         PGM_CHECK_GL();
@@ -125,4 +125,4 @@ struct OpenGlDynamicBufferTraits final
     }
 };
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Buffers
+} // namespace PGM::OpenGL

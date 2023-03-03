@@ -5,7 +5,7 @@
 #include <functional>
 #include <string>
 
-namespace PGM::ECS
+namespace PGM
 {
 
 class EntityRef;
@@ -24,4 +24,4 @@ class Scene
     friend EntityRef;
 };
 
-} // namespace PGM::ECS
+} // namespace PGM

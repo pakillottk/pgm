@@ -1,7 +1,7 @@
 #pragma once
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Logging/Logger.h>
+#include "../../../../Core/Assert/Assert.h"
+#include "../../../../Core/Logging/Logger.h"
 
 #ifdef _WIN32
 // On windows this header is required for certain types and macros...
@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace PGM::Renderer::API::Backend
+namespace PGM::OpenGL
 {
 
 inline GLenum glCheckError(const char *file, int line)
@@ -50,11 +50,13 @@ inline GLenum glCheckError(const char *file, int line)
         PGM_ASSERT(errorCode == GL_NO_ERROR, "OpenGL Error");
     }
     return errorCode;
-} // namespace PGM::Renderer::API::Backend
+
+} // namespace PGM::OpenGL
+
 #ifdef PGM_ASSERTS_ENABLED
-#define PGM_CHECK_GL() PGM_ASSERT(glCheckError(__FILE__, __LINE__) == GL_NO_ERROR, "OpenGL Error");
+#define PGM_CHECK_GL() PGM_ASSERT(::PGM::OpenGL::glCheckError(__FILE__, __LINE__) == GL_NO_ERROR, "OpenGL Error");
 #else
-#define PGM_CHECK_GL() glCheckError(__FILE__, __LINE__)
+#define PGM_CHECK_GL() ::PGM::OpenGL::glCheckError(__FILE__, __LINE__)
 #endif
 
-} // namespace PGM::Renderer::API::Backend
+} // namespace PGM::OpenGL

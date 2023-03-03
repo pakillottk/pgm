@@ -1,13 +1,13 @@
 #pragma once
 
-namespace PGM::Renderer::API::Textures
+namespace PGM
 {
 
 enum PixelType
 {
-    Byte,
-    Int,
-    Float
+    BytePixel,
+    IntPixel,
+    FloatPixel
 };
 
 // TODO(pgm) Wrapping mode, mipmap config...
@@ -33,4 +33,4 @@ class Texture2d
     virtual void unbind() const = 0;
 };
 
-} // namespace PGM::Renderer::API::Textures
+} // namespace PGM

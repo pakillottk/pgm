@@ -1,7 +1,7 @@
 #include "OpenGlTexture2d.h"
 #include "../GlCheck.h"
 
-#include <PGM/Core/Assert/Assert.h>
+#include "../../../../../Core/Assert/Assert.h"
 #ifdef _WIN32
 // On windows this header is required for certain types and macros...
 #include <Windows.h>
@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <gl/GL.h>
 
-namespace PGM::Renderer::API::Backend::OpenGL::Textures
+namespace PGM::OpenGL
 {
 
 static constexpr GLenum mapInputFormat(unsigned channelCount)
@@ -33,12 +33,11 @@ static constexpr GLenum mapInputFormat(unsigned channelCount)
     }
 }
 
-static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::PixelType pixelType,
-                                                 unsigned channelCount)
+static constexpr GLenum mapTextureInternalFormat(PixelType pixelType, unsigned channelCount)
 {
     switch (pixelType)
     {
-    case PGM::Renderer::API::Textures::Byte:
+    case PGM::BytePixel:
         switch (channelCount)
         {
         case 1:
@@ -55,7 +54,7 @@ static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::P
         }
         break;
 
-    case PGM::Renderer::API::Textures::Int:
+    case PGM::IntPixel:
         switch (channelCount)
         {
         case 1:
@@ -72,7 +71,7 @@ static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::P
         }
         break;
 
-    case PGM::Renderer::API::Textures::Float:
+    case PGM::FloatPixel:
         switch (channelCount)
         {
         case 1:
@@ -97,17 +96,17 @@ static constexpr GLenum mapTextureInternalFormat(PGM::Renderer::API::Textures::P
     return 0;
 }
 
-static constexpr GLenum mapPixelDataType(PGM::Renderer::API::Textures::PixelType pixelType)
+static constexpr GLenum mapPixelDataType(PixelType pixelType)
 {
     switch (pixelType)
     {
-    case PGM::Renderer::API::Textures::Byte:
+    case PGM::BytePixel:
         return GL_UNSIGNED_BYTE;
 
-    case PGM::Renderer::API::Textures::Int:
+    case PGM::IntPixel:
         return GL_INT;
 
-    case PGM::Renderer::API::Textures::Float:
+    case PGM::FloatPixel:
         return GL_FLOAT;
 
     default:
@@ -116,8 +115,8 @@ static constexpr GLenum mapPixelDataType(PGM::Renderer::API::Textures::PixelType
     }
 }
 
-OpenGlTexture2d::OpenGlTexture2d(PGM::Renderer::API::Textures::PixelType pixelType, unsigned channelCount, unsigned w,
-                                 unsigned h, const void *data /*= nullptr*/)
+OpenGlTexture2d::OpenGlTexture2d(PixelType pixelType, unsigned channelCount, unsigned w, unsigned h,
+                                 const void *data /*= nullptr*/)
     : m_Id(0), m_PixelType(pixelType), m_ChannelCount(channelCount), m_Width(w), m_Height(h)
 {
     PGM_ASSERT(channelCount > 0 && channelCount <= 4, "Channel count must be [1-4]");
@@ -196,4 +195,4 @@ void OpenGlTexture2d::destroyImpl()
     m_Id = 0;
 }
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Textures
+} // namespace PGM::OpenGL

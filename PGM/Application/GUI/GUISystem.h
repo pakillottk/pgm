@@ -2,30 +2,30 @@
 
 #include "../ApplicationSystem.h"
 
-#include <PGM/Renderer/API/Buffers/VertexArray.h>
-#include <PGM/Renderer/API/Shaders/Shader.h>
-#include <PGM/Renderer/API/Textures/Texture2d.h>
+#include "../../Renderer/API/Buffers/VertexArray.h"
+#include "../../Renderer/API/Shaders/Shader.h"
+#include "../../Renderer/API/Textures/Texture2d.h"
 
-#include <PGM/GUI/GUI.h>
+#include "../../GUI/GUI.h"
 
 namespace PGM::GUI
 {
 
-class GUISystem : public ApplicationSystem
+class GUISystem : public PGM::ApplicationSystem
 {
   public:
-    inline GUISystem(const Application &app) : ApplicationSystem(app)
+    inline GUISystem(Application &app) : ApplicationSystem(app)
     {
     }
 
     // IO Handling
-    bool onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent) override;
-    bool onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent) override;
-    bool onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent) override;
+    bool onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent) override;
+    bool onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent) override;
+    bool onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent) override;
 
-    bool onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent) override;
-    bool onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent) override;
-    bool onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent) override;
+    bool onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent) override;
+    bool onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent) override;
+    bool onTextInput(const WindowEvents::WindowTextInput &textInputEvent) override;
 
     // Life cycle
     void onActivate() override;
@@ -40,4 +40,4 @@ class GUISystem : public ApplicationSystem
     GUI::RenderData m_RenderData;
 };
 
-} // namespace PGM::GUI
+} // namespace PGM

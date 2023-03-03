@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace PGM::ECS::Components
+namespace PGM::Components
 {
 
 struct TagComponent
@@ -10,4 +10,4 @@ struct TagComponent
     std::string name;
 };
 
-} // namespace PGM::ECS::Components
+} // namespace PGM::Components

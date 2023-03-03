@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace PGM::Renderer::API::Shaders
+namespace PGM
 {
 
 class Shader
@@ -35,4 +35,4 @@ class Shader
     virtual void setUniform(int loc, const Mat4 &matrix) const = 0;
 };
 
-} // namespace PGM::Renderer::API::Shaders
+} // namespace PGM

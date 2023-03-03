@@ -14,12 +14,11 @@ target_link_libraries(
   pgm_sandbox 
 
   PRIVATE 
-    pgm::application
-    pgm::ecs
+    pgm::pgm
 )
 
 if(MSVC)
-  set(WARN_LEVEL "-W4")
+  set(WARN_LEVEL "-W4" "/permissive-")
 else()
   set(WARN_LEVEL "-Wall" "-Wextra" "-Wpedantic")
 endif()

@@ -3,7 +3,7 @@
 #include "../../Input/Keyboard.h"
 #include "../../Input/Mouse.h"
 
-namespace PGM::Platform::WindowEvents
+namespace PGM::WindowEvents
 {
 
 struct WindowResized final

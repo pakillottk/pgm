@@ -6,8 +6,8 @@
 #include "Shaders/OpenGlShader.h"
 #include "Textures/OpenGlTexture2d.h"
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Logging/Logger.h>
+#include "../../../../Core/Assert/Assert.h"
+#include "../../../../Core/Logging/Logger.h"
 
 #ifdef _WIN32
 // On windows this header is required for certain types and macros...
@@ -20,7 +20,7 @@
 
 #define internal static
 
-namespace PGM::Renderer::API::Backend
+namespace PGM::OpenGL
 {
 
 void OpenGlCommands::clear(ClearBufferMask mask, Color clearColor /*= Colors::Black*/) const
@@ -92,42 +92,39 @@ void OpenGlCommands::blending(bool enable) const
     PGM_CHECK_GL();
 }
 
-SharedRef<Buffers::GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t size,
-                                                           const void *data /*= nullptr*/) const
+SharedRef<GpuBuffer> OpenGlCommands::createBuffer(bool dynamic, size_t size, const void *data /*= nullptr*/) const
 {
     if (dynamic)
     {
-        return make_shared_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlDynamicBufferTraits{}, size, data);
+        return make_shared_ref<GpuBuffer>(OpenGL::OpenGlDynamicBufferTraits{}, size, data);
     }
     else
     {
-        return make_shared_ref<Buffers::GpuBuffer>(OpenGL::Buffers::OpenGlStaticBufferTraits{}, size, data);
+        return make_shared_ref<GpuBuffer>(OpenGL::OpenGlStaticBufferTraits{}, size, data);
     }
 }
 
-SharedRef<Buffers::VertexArray> OpenGlCommands::createVertexArray(
-    std::initializer_list<Buffers::VertexAttrib> attributes) const
+SharedRef<VertexArray> OpenGlCommands::createVertexArray(std::initializer_list<VertexAttrib> attributes) const
 {
-    return make_shared_ref<OpenGL::Buffers::VertexArrayImpl>(attributes);
+    return make_shared_ref<OpenGL::VertexArrayImpl>(attributes);
 }
 
-SharedRef<Buffers::VertexArray> OpenGlCommands::createIndexedVertexArray(
-    const Buffers::VertexAttrib &indexAttribute, std::initializer_list<Buffers::VertexAttrib> attributes) const
+SharedRef<VertexArray> OpenGlCommands::createIndexedVertexArray(const VertexAttrib &indexAttribute,
+                                                                std::initializer_list<VertexAttrib> attributes) const
 {
-    return make_shared_ref<OpenGL::Buffers::VertexArrayImpl>(indexAttribute, attributes);
+    return make_shared_ref<OpenGL::VertexArrayImpl>(indexAttribute, attributes);
 }
 
-SharedRef<Shaders::Shader> OpenGlCommands::createShader(const std::string_view &vertexSource,
-                                                        const std::string_view &fragmentSource) const
+SharedRef<Shader> OpenGlCommands::createShader(const std::string_view &vertexSource,
+                                               const std::string_view &fragmentSource) const
 {
-    return make_shared_ref<OpenGL::Shaders::OpenGlShader>(vertexSource, fragmentSource);
+    return make_shared_ref<OpenGlShader>(vertexSource, fragmentSource);
 }
 
-SharedRef<Textures::Texture2d> OpenGlCommands::createTexture2d(Textures::PixelType pixelType, unsigned channelCount,
-                                                               unsigned w, unsigned h,
-                                                               const void *data /*= nullptr*/) const
+SharedRef<Texture2d> OpenGlCommands::createTexture2d(PixelType pixelType, unsigned channelCount, unsigned w, unsigned h,
+                                                     const void *data /*= nullptr*/) const
 {
-    return make_shared_ref<Backend::OpenGL::Textures::OpenGlTexture2d>(pixelType, channelCount, w, h, data);
+    return make_shared_ref<OpenGlTexture2d>(pixelType, channelCount, w, h, data);
 }
 
 static constexpr GLenum mapPrimitiveType(PrimitiveType primitive)
@@ -143,26 +140,26 @@ static constexpr GLenum mapPrimitiveType(PrimitiveType primitive)
     }
 }
 
-static constexpr GLenum mapIndexType(Buffers::VertexAttribDataType type)
+static constexpr GLenum mapIndexType(VertexAttribDataType type)
 {
     switch (type)
     {
-    case Buffers::Byte:
+    case Byte:
         return GL_BYTE;
 
-    case Buffers::UnsignedByte:
+    case UnsignedByte:
         return GL_UNSIGNED_BYTE;
 
-    case Buffers::Short:
+    case Short:
         return GL_SHORT;
 
-    case Buffers::UnsignedShort:
+    case UnsignedShort:
         return GL_UNSIGNED_SHORT;
 
-    case Buffers::Int:
+    case Int:
         return GL_INT;
 
-    case Buffers::Uint:
+    case Uint:
         return GL_UNSIGNED_INT;
 
     default:
@@ -171,7 +168,7 @@ static constexpr GLenum mapIndexType(Buffers::VertexAttribDataType type)
     }
 }
 
-void OpenGlCommands::drawIndexed(PrimitiveType primitive, unsigned elements, Buffers::VertexAttribDataType indexType,
+void OpenGlCommands::drawIndexed(PrimitiveType primitive, unsigned elements, VertexAttribDataType indexType,
                                  size_t offset) const
 {
     static_assert(sizeof(size_t) == sizeof(void *), "Size mismatch");
@@ -186,4 +183,4 @@ void OpenGlCommands::draw(PrimitiveType primitive, unsigned vertexCount, size_t 
     PGM_CHECK_GL();
 }
 
-} // namespace PGM::Renderer::API::Backend
+} // namespace PGM::OpenGL

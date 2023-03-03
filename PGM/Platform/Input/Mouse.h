@@ -4,7 +4,7 @@
 
 #include <PGM/Core/Vec/Vec.h>
 
-namespace PGM::Platform::Input
+namespace PGM::Input
 {
 
 enum MouseButton
@@ -17,4 +17,4 @@ enum MouseButton
 bool isMouseButtonDown(MouseButton button);
 Vec2 mousePosition(const Window &wnd);
 
-} // namespace PGM::Platform::Input
+} // namespace PGM::Input

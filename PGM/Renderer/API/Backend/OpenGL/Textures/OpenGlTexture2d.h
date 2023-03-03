@@ -2,14 +2,13 @@
 
 #include "../../../Textures/Texture2d.h"
 
-namespace PGM::Renderer::API::Backend::OpenGL::Textures
+namespace PGM::OpenGL
 {
 
-class OpenGlTexture2d : public PGM::Renderer::API::Textures::Texture2d
+class OpenGlTexture2d : public Texture2d
 {
   public:
-    OpenGlTexture2d(PGM::Renderer::API::Textures::PixelType pixelType, unsigned channelCount, unsigned w, unsigned h,
-                    const void *data = nullptr);
+    OpenGlTexture2d(PixelType pixelType, unsigned channelCount, unsigned w, unsigned h, const void *data = nullptr);
 
     inline ~OpenGlTexture2d()
     {
@@ -31,7 +30,7 @@ class OpenGlTexture2d : public PGM::Renderer::API::Textures::Texture2d
         return m_Id;
     }
 
-    inline PGM::Renderer::API::Textures::PixelType pixelType() const override
+    inline PixelType pixelType() const override
     {
         return m_PixelType;
     }
@@ -58,7 +57,7 @@ class OpenGlTexture2d : public PGM::Renderer::API::Textures::Texture2d
 
   private:
     int m_Id;
-    PGM::Renderer::API::Textures::PixelType m_PixelType;
+    PixelType m_PixelType;
     unsigned m_ChannelCount;
     unsigned m_Width;
     unsigned m_Height;
@@ -66,4 +65,4 @@ class OpenGlTexture2d : public PGM::Renderer::API::Textures::Texture2d
     void destroyImpl();
 };
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Textures
+} // namespace PGM::OpenGL

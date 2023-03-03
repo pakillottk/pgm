@@ -1,9 +1,9 @@
 #pragma once
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Ref/Ref.h>
+#include "../../../Core/Assert/Assert.h"
+#include "../../../Core/Ref/Ref.h"
 
-namespace PGM::Renderer::API::Buffers
+namespace PGM
 {
 
 static constexpr int NULL_BUFFER_ID = -1;
@@ -138,4 +138,4 @@ class GpuBuffer
     size_t m_Size;
 };
 
-} // namespace PGM::Renderer::API::Buffers
+} // namespace PGM

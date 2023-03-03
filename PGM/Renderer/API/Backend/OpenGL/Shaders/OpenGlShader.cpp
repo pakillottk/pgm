@@ -1,7 +1,7 @@
 #include "OpenGlShader.h"
 #include "../GlCheck.h"
 
-#include <PGM/Core/Logging/Logger.h>
+#include "../../../../../Core/Logging/Logger.h"
 #ifdef _WIN32
 // On windows this header is required for certain types and macros...
 #include <Windows.h>
@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <gl/GL.h>
 
-namespace PGM::Renderer::API::Backend::OpenGL::Shaders
+namespace PGM::OpenGL
 {
 
 static int createShader(const std::string_view &vertexSource, const std::string_view &fragmentSource)
@@ -179,4 +179,4 @@ void OpenGlShader::setUniform(int loc, const Mat4 &matrix) const
     PGM_CHECK_GL();
 }
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Shaders
+} // namespace PGM::OpenGL

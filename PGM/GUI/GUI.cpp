@@ -93,7 +93,7 @@ bool ImGui::InputTextWithHint(const char *label, const char *hint, std::string *
 namespace PGM::GUI
 {
 
-RenderData initializeRenderData(const Renderer::RenderContext &ctx)
+RenderData initializeRenderData(const Renderer &ctx)
 {
     RenderData renderData = {};
     renderData.context = &ctx;
@@ -136,13 +136,12 @@ RenderData initializeRenderData(const Renderer::RenderContext &ctx)
     renderData.vertices = ctx->createBuffer(true, 0);
     renderData.indices = ctx->createBuffer(true, 0);
     renderData.vao = ctx->createIndexedVertexArray(
-        Renderer::API::Buffers::VertexAttrib{renderData.indices},
-        {Renderer::API::Buffers::VertexAttrib{renderData.vertices, POSITION_LOC, Renderer::API::Buffers::Float, 2,
-                                              sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, pos)},
-         Renderer::API::Buffers::VertexAttrib{renderData.vertices, UV_LOC, Renderer::API::Buffers::Float, 2,
-                                              sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, uv)},
-         Renderer::API::Buffers::VertexAttrib{renderData.vertices, COLOR_LOC, Renderer::API::Buffers::UnsignedByte, 4,
-                                              sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, col), true}});
+        PGM::VertexAttrib{renderData.indices},
+        {PGM::VertexAttrib{renderData.vertices, POSITION_LOC, PGM::Float, 2, sizeof(ImDrawVert),
+                           IM_OFFSETOF(ImDrawVert, pos)},
+         PGM::VertexAttrib{renderData.vertices, UV_LOC, PGM::Float, 2, sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, uv)},
+         PGM::VertexAttrib{renderData.vertices, COLOR_LOC, PGM::UnsignedByte, 4, sizeof(ImDrawVert),
+                           IM_OFFSETOF(ImDrawVert, col), true}});
 
     ImGuiIO &io = ImGui::GetIO();
 
@@ -150,7 +149,7 @@ RenderData initializeRenderData(const Renderer::RenderContext &ctx)
     unsigned char *pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-    renderData.fontAtlas = ctx->createTexture2d(Renderer::API::Textures::Byte, 4, width, height, pixels);
+    renderData.fontAtlas = ctx->createTexture2d(PGM::BytePixel, 4, width, height, pixels);
 
     io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(renderData.fontAtlas.get()));
 
@@ -282,11 +281,11 @@ void renderImGui(ImDrawData *draw_data, RenderData &renderData)
         return;
     }
 
-    auto &api = *renderData.context->commands();
+    auto &api = *renderData.context;
 
-    api.blending(true);
-    api.depthTest(false);
-    api.setViewport({0, 0, fb_width, fb_height});
+    api->blending(true);
+    api->depthTest(false);
+    api->setViewport({0, 0, fb_width, fb_height});
 
     float L = draw_data->DisplayPos.x;
     float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
@@ -309,7 +308,6 @@ void renderImGui(ImDrawData *draw_data, RenderData &renderData)
 
         renderData.shader->bind();
         renderData.vao->bind();
-        renderData.fontAtlas->bind(1);
 
         // Will project scissor/clipping rectangles into framebuffer space
         ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -328,12 +326,16 @@ void renderImGui(ImDrawData *draw_data, RenderData &renderData)
             {
                 continue;
             }
-            api.setClipRegion({(int)clip_min.x, (int)((float)fb_height - clip_max.y), (int)(clip_max.x - clip_min.x),
-                               (int)(clip_max.y - clip_min.y)});
-            api.drawIndexed(Renderer::API::Triangles, pcmd->ElemCount,
-                            sizeof(ImDrawIdx) == 2 ? Renderer::API::Buffers::UnsignedShort
-                                                   : Renderer::API::Buffers::Uint,
-                            (pcmd->IdxOffset * sizeof(ImDrawIdx)));
+            api->setClipRegion({(int)clip_min.x, (int)((float)fb_height - clip_max.y), (int)(clip_max.x - clip_min.x),
+                                (int)(clip_max.y - clip_min.y)});
+
+            auto texId = pcmd->GetTexID();
+            PGM_ASSERT(texId != nullptr, "Null TexID");
+            auto tex = reinterpret_cast<Texture2d *>(texId);
+            tex->bind(1);
+
+            api->drawIndexed(PGM::Triangles, pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? PGM::UnsignedShort : PGM::Uint,
+                             (pcmd->IdxOffset * sizeof(ImDrawIdx)));
         }
 
         renderData.fontAtlas->unbind();

@@ -20,6 +20,11 @@ inline void assert_msg_begin()
     fmt::print(fmt::fg(fmt::color::red), "Detail:\t");
 }
 
+template <typename Arg> inline void assert_msg_impl(Arg &&arg)
+{
+    fmt::print(fmt::fg(fmt::color::red), "{}", std::forward<Arg>(arg));
+}
+
 template <typename Arg, typename... Args> inline void assert_msg_impl(Arg &&arg, Args &&...args)
 {
     fmt::print(fmt::fg(fmt::color::red), "{}", std::forward<Arg>(arg));

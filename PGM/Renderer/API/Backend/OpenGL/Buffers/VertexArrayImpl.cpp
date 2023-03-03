@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <gl/GL.h>
 
-namespace PGM::Renderer::API::Backend::OpenGL::Buffers
+namespace PGM::OpenGL
 {
 
 namespace detail
@@ -22,36 +22,36 @@ namespace detail
 
         if (id == 0)
         {
-            return PGM::Renderer::API::Buffers::NULL_VERTEX_ARRAY_ID;
+            return PGM::NULL_VERTEX_ARRAY_ID;
         }
 
         PGM_CHECK_GL();
         return static_cast<int>(id);
     }
 
-    static constexpr GLenum convertDataType(PGM::Renderer::API::Buffers::VertexAttribDataType dt)
+    static constexpr GLenum convertDataType(VertexAttribDataType dt)
     {
         switch (dt)
         {
-        case PGM::Renderer::API::Buffers::Byte:
+        case PGM::Byte:
             return GL_BYTE;
 
-        case PGM::Renderer::API::Buffers::UnsignedByte:
+        case PGM::UnsignedByte:
             return GL_UNSIGNED_BYTE;
 
-        case PGM::Renderer::API::Buffers::Short:
+        case PGM::Short:
             return GL_SHORT;
 
-        case PGM::Renderer::API::Buffers::UnsignedShort:
+        case PGM::UnsignedShort:
             return GL_UNSIGNED_SHORT;
 
-        case PGM::Renderer::API::Buffers::Int:
+        case PGM::Int:
             return GL_INT;
 
-        case PGM::Renderer::API::Buffers::Uint:
+        case PGM::Uint:
             return GL_UNSIGNED_INT;
 
-        case PGM::Renderer::API::Buffers::Float:
+        case PGM::Float:
             return GL_FLOAT;
 
         default:
@@ -60,7 +60,7 @@ namespace detail
         }
     }
 
-    inline void attachVertexAttrib(int id, bool isIndex, const PGM::Renderer::API::Buffers::VertexAttrib &attrib)
+    inline void attachVertexAttrib(int id, bool isIndex, const VertexAttrib &attrib)
     {
         if (isIndex)
         {
@@ -83,10 +83,10 @@ namespace detail
 
 } // namespace detail
 
-int VertexArrayImpl::genVertexArray(std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers)
+int VertexArrayImpl::genVertexArray(std::initializer_list<VertexAttrib> buffers)
 {
     int id = detail::genVertexArray();
-    if (id == PGM::Renderer::API::Buffers::NULL_VERTEX_ARRAY_ID)
+    if (id == PGM::NULL_VERTEX_ARRAY_ID)
     {
         return id;
     }
@@ -99,11 +99,10 @@ int VertexArrayImpl::genVertexArray(std::initializer_list<PGM::Renderer::API::Bu
     return id;
 }
 
-int VertexArrayImpl::genVertexArray(const PGM::Renderer::API::Buffers::VertexAttrib &indexBuffer,
-                                    std::initializer_list<PGM::Renderer::API::Buffers::VertexAttrib> buffers)
+int VertexArrayImpl::genVertexArray(const VertexAttrib &indexBuffer, std::initializer_list<VertexAttrib> buffers)
 {
     int id = detail::genVertexArray();
-    if (id == PGM::Renderer::API::Buffers::NULL_VERTEX_ARRAY_ID)
+    if (id == PGM::NULL_VERTEX_ARRAY_ID)
     {
         return id;
     }
@@ -130,4 +129,4 @@ void VertexArrayImpl::unbindVertexArray() const
     PGM_CHECK_GL();
 }
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Buffers
+} // namespace PGM::OpenGL

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <PGM/Core/Ref/Ref.h>
+#include "../Core/Ref/Ref.h"
 
-#include <PGM/Renderer/API/Buffers/VertexArray.h>
-#include <PGM/Renderer/API/Shaders/Shader.h>
-#include <PGM/Renderer/API/Textures/Texture2d.h>
-#include <PGM/Renderer/RenderContext.h>
+#include "../Renderer/API/Buffers/VertexArray.h"
+#include "../Renderer/API/Shaders/Shader.h"
+#include "../Renderer/API/Textures/Texture2d.h"
+#include "../Renderer/Renderer.h"
 
 struct ImDrawData;
 
@@ -14,22 +14,22 @@ namespace PGM::GUI
 
 struct RenderData
 {
-    const Renderer::RenderContext *context;
+    const Renderer *context;
 
-    SharedRef<Renderer::API::Shaders::Shader> shader;
+    SharedRef<Shader> shader;
 
-    SharedRef<Renderer::API::Textures::Texture2d> fontAtlas;
+    SharedRef<Texture2d> fontAtlas;
 
-    SharedRef<Renderer::API::Buffers::GpuBuffer> vertices;
-    SharedRef<Renderer::API::Buffers::GpuBuffer> indices;
+    SharedRef<GpuBuffer> vertices;
+    SharedRef<GpuBuffer> indices;
 
-    SharedRef<Renderer::API::Buffers::VertexArray> vao;
+    SharedRef<VertexArray> vao;
 
     int projMatLoc;
     int textSamplerLoc;
 };
 
-RenderData initializeRenderData(const Renderer::RenderContext &ctx);
+RenderData initializeRenderData(const Renderer &ctx);
 void destroyRenderData(RenderData &renderData);
 
 void setupImGuiStyle();

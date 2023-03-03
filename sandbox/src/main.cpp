@@ -10,7 +10,7 @@
 class SandboxSystem : public PGM::ApplicationSystem
 {
   public:
-    inline SandboxSystem(const PGM::Application &app) : PGM::ApplicationSystem(app)
+    inline SandboxSystem(PGM::Application &app) : PGM::ApplicationSystem(app)
     {
         m_Scene.createEntity("Entity 1");
         m_Scene.createEntity("Entity 2");
@@ -20,9 +20,9 @@ class SandboxSystem : public PGM::ApplicationSystem
     void beginFrame() override
     {
         const auto window = m_App.window();
-        m_App.context()->setViewport({0, 0, window->width(), window->height()});
-        m_App.context()->setClipRegion({0, 0, window->width(), window->height()});
-        m_App.context()->clear(PGM::Renderer::API::bColor | PGM::Renderer::API::bDepth, PGM::Color{m_Red, 0, 0, 1});
+        m_App.renderer()->setViewport({0, 0, window->width(), window->height()});
+        m_App.renderer()->setClipRegion({0, 0, window->width(), window->height()});
+        m_App.renderer()->clear(PGM::bColor | PGM::bDepth, PGM::Color{m_Red, 0, 0, 1});
     }
 
     void endFrame() override
@@ -38,10 +38,12 @@ class SandboxSystem : public PGM::ApplicationSystem
             m_Red = std::min(m_Red, 1.0f);
         }
 
+        // ImGui::DockSpaceOverViewport();
+
         if (ImGui::Begin("Scene"))
         {
-            m_Scene.for_each([](PGM::ECS::EntityRef entity) {
-                auto &tag = entity.getComponent<PGM::ECS::Components::TagComponent>();
+            m_Scene.for_each([](PGM::EntityRef entity) {
+                auto &tag = entity.getComponent<PGM::Components::TagComponent>();
                 ImGui::Selectable(tag.name.c_str());
             });
         }
@@ -49,15 +51,15 @@ class SandboxSystem : public PGM::ApplicationSystem
     }
 
   private:
-    PGM::ECS::Scene m_Scene;
+    PGM::Scene m_Scene;
     float m_Red{0.0f};
 };
 
 int main()
 {
-    PGM::Application app = PGM::Application::create<PGM::Renderer::OpenGL>(
+    PGM::Application app = PGM::Application::create<PGM::OpenGL::OpenGlRenderContext>(
         PGM::window_creation_args_t{"PGM Sandbox"},
-        PGM::Renderer::OPENGL_DEFAULT_CONTEXT_FLAGS // | PGM::Renderer::bOglContextCompatibiltyMode
+        PGM::OpenGL::OPENGL_DEFAULT_CONTEXT_FLAGS // | PGM::Renderer::bOglContextCompatibiltyMode
     );
     app.pushSystem<SandboxSystem>();
     app.run();

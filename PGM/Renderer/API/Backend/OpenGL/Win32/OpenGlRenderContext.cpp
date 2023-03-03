@@ -12,7 +12,7 @@
 
 #define internal static
 
-namespace PGM::Renderer::API::Backend
+namespace PGM::OpenGL
 {
 
 struct OpenGlRenderContext::context_t
@@ -124,7 +124,7 @@ internal HGLRC createContext(HDC dc, int desiredMajor, int desiredMinor, OpenGlC
     return context;
 }
 
-OpenGlRenderContext::OpenGlRenderContext(SharedRef<Platform::Window> window,
+OpenGlRenderContext::OpenGlRenderContext(SharedRef<Window> window,
                                          OpenGlContextFlagCreationMask flags /*= OPENGL_DEFAULT_CONTEXT_FLAGS*/,
                                          int majorVersion /*= 4*/, int minorVersion /*= 6*/)
     : m_Window{window}, m_Context{nullptr, [](OpenGlRenderContext::context_t *) {}}
@@ -176,4 +176,4 @@ void OpenGlRenderContext::swapBuffers() const
     SwapBuffers(m_Window->impl().hdc);
 }
 
-} // namespace PGM::Renderer::API::Backend
+} // namespace PGM::OpenGL

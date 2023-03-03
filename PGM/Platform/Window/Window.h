@@ -1,12 +1,12 @@
 #pragma once
 
-#include <PGM/Core/Events/EventDispatcher.h>
-#include <PGM/Core/Rect/Rect.h>
-#include <PGM/Core/Ref/Ref.h>
+#include "../../Core/Events/EventDispatcher.h"
+#include "../../Core/Rect/Rect.h"
+#include "../../Core/Ref/Ref.h"
 
 #include <string_view>
 
-namespace PGM::Platform
+namespace PGM
 {
 
 /**
@@ -62,4 +62,4 @@ class Window
     bool m_FullScreen;
 };
 
-} // namespace PGM::Platform
+} // namespace PGM

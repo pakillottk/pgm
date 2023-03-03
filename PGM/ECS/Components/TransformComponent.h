@@ -1,9 +1,9 @@
 #pragma once
 
-#include <PGM/Core/Matrix/Matrix.h>
-#include <PGM/Core/Vec/Vec.h>
+#include "../../Core/Matrix/Matrix.h"
+#include "../../Core/Vec/Vec.h"
 
-namespace PGM::ECS::Components
+namespace PGM::Components
 {
 
 struct TransformComponent
@@ -23,4 +23,4 @@ struct TransformComponent
     }
 };
 
-} // namespace PGM::ECS::Components
+} // namespace PGM::Components

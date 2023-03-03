@@ -3,7 +3,7 @@
 #include "../Components/Components.h"
 #include "../Entity/EntityRef.h"
 
-namespace PGM::ECS
+namespace PGM
 {
 
 EntityRef Scene::createEntity(std::string name)
@@ -28,4 +28,4 @@ void Scene::for_each(std::function<void(EntityRef)> callback)
     m_Registry.each([this, &callback](auto handle) { callback(EntityRef{handle, this}); });
 }
 
-} // namespace PGM::ECS
+} // namespace PGM

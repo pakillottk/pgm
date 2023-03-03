@@ -3,12 +3,12 @@
 #include "ApplicationSystemStack.h"
 #include "GUI/GUISystem.h"
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Ref/Ref.h>
-#include <PGM/Core/Time/Time.h>
-#include <PGM/Platform/Window/Events/WindowEvents.h>
-#include <PGM/Platform/Window/Window.h>
-#include <PGM/Renderer/RenderContext.h>
+#include "../Core/Assert/Assert.h"
+#include "../Core/Ref/Ref.h"
+#include "../Core/Time/Time.h"
+#include "../Platform/Window/Events/WindowEvents.h"
+#include "../Platform/Window/Window.h"
+#include "../Renderer/Renderer.h"
 
 #include <mutex>
 #include <vector>
@@ -32,33 +32,31 @@ class Application
     template <typename RenderContextBackend, typename... Args>
     inline static Application create(const window_creation_args_t &wndArgs, Args &&...args)
     {
-        auto wnd = std::make_shared<Platform::Window>(wndArgs.title, wndArgs.width, wndArgs.height);
+        auto wnd = std::make_shared<Window>(wndArgs.title, wndArgs.width, wndArgs.height);
         return Application{wnd, createContext<RenderContextBackend>(wnd, std::forward<Args>(args)...)};
     }
 
     template <typename RenderContextBackend> inline static Application create(const window_creation_args_t &wndArgs)
     {
-        auto wnd = std::make_shared<Platform::Window>(wndArgs.title, wndArgs.width, wndArgs.height);
+        auto wnd = std::make_shared<Window>(wndArgs.title, wndArgs.width, wndArgs.height);
         return Application(wnd, createContext<RenderContextBackend>(wnd));
     }
 
     /// @brief Swaps the render context. Can be done while running
     template <typename RenderContextBackend, typename... Args> inline void setContext(Args &&...args)
     {
-        std::scoped_lock<std::mutex> lk{m_RendererMutex};
-        m_RenderContext = createContext<RenderContextBackend>(m_Window, std::forward<Args>(args)...);
+        m_Renderer = Renderer{createContext<RenderContextBackend>(m_Window, std::forward<Args>(args)...)};
     }
 
     /// @brief Swaps the render context. Can be done while running
     template <typename RenderContextBackend> inline void setContext()
     {
-        std::scoped_lock<std::mutex> lk{m_RendererMutex};
-        m_RenderContext = createContext<RenderContextBackend>(m_Window);
+        m_Renderer = Renderer{createContext<RenderContextBackend>(m_Window)};
     }
 
-    const Renderer::RenderContext &context() const
+    constexpr Renderer &renderer()
     {
-        return m_RenderContext;
+        return m_Renderer;
     }
 
     template <typename SystemType, typename... Args> inline void pushSystem(Args &&...args)
@@ -66,7 +64,7 @@ class Application
         m_SystemsStack.push<SystemType>(*this, std::forward<Args>(args)...);
     }
 
-    inline const SharedRef<Platform::Window> window() const
+    inline const SharedRef<Window> window() const
     {
         return m_Window;
     }
@@ -74,49 +72,46 @@ class Application
     void run();
 
   protected:
-    void onWindowClose(const Platform::WindowEvents::WindowClose &closeEvent);
-    void onWindowResized(const Platform::WindowEvents::WindowResized &resizeEvent);
+    void onWindowClose(const WindowEvents::WindowClose &closeEvent);
+    void onWindowResized(const WindowEvents::WindowResized &resizeEvent);
 
-    void onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent);
-    void onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent);
-    void onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent);
+    void onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent);
+    void onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent);
+    void onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent);
 
-    void onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent);
-    void onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent);
-    void onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent);
+    void onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent);
+    void onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent);
+    void onTextInput(const WindowEvents::WindowTextInput &textInputEvent);
 
   private:
     void bindEvents();
 
     template <typename RenderContextBackend, typename... Args>
-    static inline Renderer::RenderContext createContext(SharedRef<Platform::Window> wnd, Args &&...args)
+    static inline RenderContext createContext(SharedRef<Window> wnd, Args &&...args)
     {
         Logging::log_debug("(APP) Creating render context with backend: {}", typeid(RenderContextBackend).name());
-        return Renderer::RenderContext(RenderContextBackend(wnd, std::forward<Args>(args)...));
+        return RenderContext(RenderContextBackend(wnd, std::forward<Args>(args)...));
     }
 
-    template <typename RenderContextBackend>
-    static inline Renderer::RenderContext createContext(SharedRef<Platform::Window> wnd)
+    template <typename RenderContextBackend> static inline RenderContext createContext(SharedRef<Window> wnd)
     {
         Logging::log_debug("(APP) Creating render context with backend: {}", typeid(RenderContextBackend).name());
-        return Renderer::RenderContext(RenderContextBackend(wnd));
+        return RenderContext(RenderContextBackend(wnd));
     }
 
-    inline Application(SharedRef<Platform::Window> wnd, Renderer::RenderContext context)
-        : m_Window{wnd}, m_RenderContext{std::move(context)}, m_WindowClosed{false}, m_GUI(*this)
+    inline Application(SharedRef<Window> wnd, RenderContext context)
+        : m_Window{wnd}, m_Renderer{std::move(context)}, m_WindowClosed{false}, m_GUI(*this)
     {
         bindEvents();
     }
 
-    SharedRef<Platform::Window> m_Window;
+    SharedRef<Window> m_Window;
     GUI::GUISystem m_GUI;
     ApplicationSystemStack m_SystemsStack;
-    Renderer::RenderContext m_RenderContext;
+    Renderer m_Renderer;
     bool m_WindowClosed;
 
     Time m_LastFrameTime;
-
-    std::mutex m_RendererMutex;
     std::vector<Events::EventListener> m_EventListeners;
 };
 

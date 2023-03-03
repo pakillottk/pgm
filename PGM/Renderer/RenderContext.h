@@ -1,13 +1,13 @@
 #pragma once
 
-#include "API/Commands.h"
+#include "API/RendererCommands.h"
 
-#include <PGM/Core/Ref/Ref.h>
-#include <PGM/Platform/Window/Window.h>
+#include "../Core/Ref/Ref.h"
+#include "../Platform/Window/Window.h"
 
 #include <memory>
 
-namespace PGM::Renderer
+namespace PGM
 {
 
 class RenderContext
@@ -37,17 +37,17 @@ class RenderContext
         m_Context->swapBuffers();
     }
 
-    inline const API::Commands *commands() const
+    inline const RendererCommands *commands() const
     {
         return m_Context->commands();
     }
 
-    inline const API::Commands *operator->() const
+    inline const RendererCommands *operator->() const
     {
         return commands();
     }
 
-    inline SharedRef<Platform::Window> window() const
+    inline SharedRef<Window> window() const
     {
         return m_Context->window();
     }
@@ -60,9 +60,9 @@ class RenderContext
         virtual bool bind() const = 0;
         virtual void unbind() const = 0;
         virtual void swapBuffers() const = 0;
-        virtual const API::Commands *commands() const = 0;
+        virtual const RendererCommands *commands() const = 0;
 
-        virtual SharedRef<Platform::Window> window() const = 0;
+        virtual SharedRef<Window> window() const = 0;
     };
 
     template <typename RenderContextBackend> struct graphics_context_model_t : public graphics_context_concept_t
@@ -81,7 +81,7 @@ class RenderContext
             backend.unbind();
         }
 
-        virtual const API::Commands *commands() const override
+        virtual const RendererCommands *commands() const override
         {
             return backend.commands();
         }
@@ -91,7 +91,7 @@ class RenderContext
             backend.swapBuffers();
         }
 
-        inline SharedRef<Platform::Window> window() const override
+        inline SharedRef<Window> window() const override
         {
             return backend.window();
         }
@@ -102,4 +102,4 @@ class RenderContext
     Ref<graphics_context_concept_t> m_Context;
 };
 
-} // namespace PGM::Renderer
+} // namespace PGM

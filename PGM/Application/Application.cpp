@@ -23,9 +23,9 @@ void Application::run()
     m_LastFrameTime = Timer::now();
 
     // Initialize GUI
-    m_RenderContext.bind();
+    m_Renderer.begin();
     m_GUI.onActivate();
-    m_RenderContext.unbind();
+    m_Renderer.end();
 
     while (m_Window->pumpMessages())
     {
@@ -35,8 +35,7 @@ void Application::run()
         }
 
         // TODO: FPS Cap
-        std::scoped_lock<std::mutex> lk{m_RendererMutex};
-        if (!m_RenderContext.bind())
+        if (!m_Renderer.begin())
         {
             break;
         }
@@ -66,28 +65,27 @@ void Application::run()
 
         m_GUI.endFrame();
 
-        m_RenderContext.swapBuffers();
-        m_RenderContext.unbind();
+        m_Renderer.end();
     }
 }
 
-void Application::onWindowClose([[maybe_unused]] const Platform::WindowEvents::WindowClose &closeEvent)
+void Application::onWindowClose([[maybe_unused]] const WindowEvents::WindowClose &closeEvent)
 {
     m_WindowClosed = true;
     Logging::log_debug("Window closed");
 
-    m_RenderContext.bind();
+    m_Renderer.begin();
     m_GUI.onDeactivate();
     m_SystemsStack.clear();
-    m_RenderContext.unbind();
+    m_Renderer.end();
 }
 
-void Application::onWindowResized(const Platform::WindowEvents::WindowResized &resizeEvent)
+void Application::onWindowResized(const WindowEvents::WindowResized &resizeEvent)
 {
     Logging::log_debug("Window resized: W={} H={}", resizeEvent.width, resizeEvent.height);
 }
 
-void Application::onMouseMove(const Platform::WindowEvents::MouseMove &mouseMoveEvent)
+void Application::onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent)
 {
     if (m_GUI.onMouseMove(mouseMoveEvent))
     {
@@ -103,7 +101,7 @@ void Application::onMouseMove(const Platform::WindowEvents::MouseMove &mouseMove
     }
 }
 
-void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mouseDownEvent)
+void Application::onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent)
 {
     Logging::log_debug("Mouse button pressed: {} (Double clicked: {})", mouseDownEvent.button,
                        mouseDownEvent.isDoubleClick);
@@ -122,7 +120,7 @@ void Application::onMouseDown(const Platform::WindowEvents::MouseButtonDown &mou
     }
 }
 
-void Application::onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUpEvent)
+void Application::onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent)
 {
     Logging::log_debug("Mouse button released: {}", mouseUpEvent.button);
 
@@ -140,7 +138,7 @@ void Application::onMouseUp(const Platform::WindowEvents::MouseButtonUp &mouseUp
     }
 }
 
-void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDownEvent)
+void Application::onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent)
 {
     Logging::log_debug("Key pressed: {} repeat={}", keyDownEvent.key, keyDownEvent.repeat);
 
@@ -158,7 +156,7 @@ void Application::onKeyDown(const Platform::WindowEvents::WindowKeyDown &keyDown
     }
 }
 
-void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
+void Application::onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent)
 {
     Logging::log_debug("Key released: {}", keyUpEvent.key);
 
@@ -176,7 +174,7 @@ void Application::onKeyUp(const Platform::WindowEvents::WindowKeyUp &keyUpEvent)
     }
 }
 
-void Application::onTextInput(const Platform::WindowEvents::WindowTextInput &textInputEvent)
+void Application::onTextInput(const WindowEvents::WindowTextInput &textInputEvent)
 {
     Logging::log_debug("Text input received: {}", textInputEvent.input);
 
@@ -196,24 +194,24 @@ void Application::onTextInput(const Platform::WindowEvents::WindowTextInput &tex
 
 void Application::bindEvents()
 {
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowClose>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::WindowClose>(
         [this](const auto &event) { this->onWindowClose(event); }));
 
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowResized>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::WindowResized>(
         [this](const auto &event) { this->onWindowResized(event); }));
 
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseMove>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::MouseMove>(
         [this](const auto &event) { this->onMouseMove(event); }));
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseButtonDown>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::MouseButtonDown>(
         [this](const auto &event) { this->onMouseDown(event); }));
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::MouseButtonUp>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::MouseButtonUp>(
         [this](const auto &event) { this->onMouseUp(event); }));
 
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowKeyDown>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::WindowKeyDown>(
         [this](const auto &event) { this->onKeyDown(event); }));
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowKeyUp>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::WindowKeyUp>(
         [this](const auto &event) { this->onKeyUp(event); }));
-    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<Platform::WindowEvents::WindowTextInput>(
+    m_EventListeners.push_back(m_Window->dispatcher()->suscribe<WindowEvents::WindowTextInput>(
         [this](const auto &event) { this->onTextInput(event); }));
 }
 

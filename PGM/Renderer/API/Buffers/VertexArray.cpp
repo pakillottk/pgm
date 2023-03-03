@@ -1,6 +1,6 @@
 #include "VertexArray.h"
 
-namespace PGM::Renderer::API::Buffers
+namespace PGM
 {
 
 VertexArray::VertexArray(std::initializer_list<VertexAttrib> buffers) : m_Attribs{buffers}, m_Indexed{false}
@@ -41,4 +41,4 @@ void VertexArray::unbind() const
     unbindVertexArray();
 }
 
-} // namespace PGM::Renderer::API::Buffers
+} // namespace PGM

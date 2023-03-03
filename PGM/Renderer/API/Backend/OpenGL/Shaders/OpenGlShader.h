@@ -2,10 +2,10 @@
 
 #include "../../../Shaders/Shader.h"
 
-namespace PGM::Renderer::API::Backend::OpenGL::Shaders
+namespace PGM::OpenGL
 {
 
-class OpenGlShader final : public PGM::Renderer::API::Shaders::Shader
+class OpenGlShader final : public Shader
 {
   public:
     OpenGlShader(const std::string_view &vertexSource, const std::string_view &fragmentSource);
@@ -39,4 +39,4 @@ class OpenGlShader final : public PGM::Renderer::API::Shaders::Shader
     int m_Id;
 };
 
-} // namespace PGM::Renderer::API::Backend::OpenGL::Shaders
+} // namespace PGM::OpenGL

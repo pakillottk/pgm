@@ -2,14 +2,14 @@
 
 #include "GpuBuffer.h"
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Ref/Ref.h>
+#include "../../../Core/Assert/Assert.h"
+#include "../../../Core/Ref/Ref.h"
 
 #include <algorithm>
 #include <initializer_list>
 #include <vector>
 
-namespace PGM::Renderer::API::Buffers
+namespace PGM
 {
 
 enum AttribLocations : unsigned
@@ -23,7 +23,12 @@ enum AttribLocations : unsigned
     Binormal = 3,
 
     // Texcoords
-    UV0 = 4
+    UV0 = 4,
+    UV1 = 5,
+    UV2 = 6,
+
+    // VertexData
+    VertexColor = 7
 };
 
 enum VertexAttribDataType
@@ -102,4 +107,4 @@ class VertexArray
     }
 };
 
-} // namespace PGM::Renderer::API::Buffers
+} // namespace PGM

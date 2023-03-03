@@ -1,11 +1,11 @@
 #include "../Mouse.h"
 #include "../../Window/Win32/WindowImpl.h"
 
-#include <PGM/Core/Assert/Assert.h>
+#include "../../../Core/Assert/Assert.h"
 
 #include <Windows.h>
 
-namespace PGM::Platform::Input
+namespace PGM::Input
 {
 
 bool isMouseButtonDown(MouseButton button)
@@ -35,4 +35,4 @@ Vec2 mousePosition(const Window &wnd)
     return Vec2{};
 }
 
-} // namespace PGM::Platform::Input
+} // namespace PGM::Input

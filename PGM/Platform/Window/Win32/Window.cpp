@@ -1,10 +1,12 @@
 #include "../Window.h"
 #include "../../Strings/Strings.h"
 #include "../Events/WindowEvents.h"
+
 #include "WindowImpl.h"
 
-#include <PGM/Core/Assert/Assert.h>
-#include <PGM/Core/Logging/Logger.h>
+#include "../../../Core/Assert/Assert.h"
+#include "../../../Core/Logging/Logger.h"
+
 #include <cassert>
 #include <stdexcept>
 #include <tuple>
@@ -14,7 +16,7 @@
 
 #define internal static
 
-namespace PGM::Platform
+namespace PGM
 {
 
 static constexpr Input::Key convertFromPlatformKey(int nativeKey)
@@ -571,4 +573,4 @@ bool Window::pumpMessages()
     return false;
 }
 
-} // namespace PGM::Platform
+} // namespace PGM

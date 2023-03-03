@@ -1,9 +1,9 @@
 #pragma once
 
-#include <PGM/Core/Ref/Ref.h>
+#include "../../Core/Ref/Ref.h"
 #include <vector>
 
-namespace PGM::ECS::Components
+namespace PGM::Components
 {
 
 class ComponentMeta
@@ -45,4 +45,4 @@ struct MetadataComponent
     MetadataComponent &operator=(const MetadataComponent &) = delete;
 };
 
-} // namespace PGM::ECS::Components
+} // namespace PGM::Components

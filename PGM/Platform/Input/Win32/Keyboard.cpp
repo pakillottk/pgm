@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-namespace PGM::Platform::Input
+namespace PGM::Input
 {
 
 namespace detail
@@ -226,4 +226,4 @@ bool isKeyDown(Key key)
     return (GetAsyncKeyState(win32Key) & 0x8000) != 0;
 }
 
-} // namespace PGM::Platform::Input
+} // namespace PGM::Input

@@ -3,10 +3,10 @@
 #include "../Components/MetadataComponent.h"
 #include "../Scene/Scene.h"
 
-#include <PGM/Core/Assert/Assert.h>
+#include "../../Core/Assert/Assert.h"
 #include <entt/entt.hpp>
 
-namespace PGM::ECS
+namespace PGM
 {
 
 using entity_id = entt::entity;
@@ -67,4 +67,4 @@ class EntityRef
 
     friend class Scene;
 };
-} // namespace PGM::ECS
+} // namespace PGM
