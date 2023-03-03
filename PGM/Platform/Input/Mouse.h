@@ -2,7 +2,7 @@
 
 #include "../Window/Window.h"
 
-#include <PGM/Core/Vec/Vec.h>
+#include "../../Core/Vec/Vec.h"
 
 namespace PGM::Input
 {

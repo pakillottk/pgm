@@ -17,31 +17,31 @@ class ApplicationSystem
     }
 
     // IO Handling
-    inline virtual bool onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent)
+    inline virtual bool onMouseMove([[maybe_unused]] const WindowEvents::MouseMove &mouseMoveEvent)
     {
         return false;
     }
-    inline virtual bool onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent)
-    {
-        return false;
-    }
-
-    inline virtual bool onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent)
+    inline virtual bool onMouseDown([[maybe_unused]] const WindowEvents::MouseButtonDown &mouseDownEvent)
     {
         return false;
     }
 
-    inline virtual bool onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent)
+    inline virtual bool onMouseUp([[maybe_unused]] const WindowEvents::MouseButtonUp &mouseUpEvent)
     {
         return false;
     }
 
-    inline virtual bool onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent)
+    inline virtual bool onKeyDown([[maybe_unused]] const WindowEvents::WindowKeyDown &keyDownEvent)
     {
         return false;
     }
 
-    inline virtual bool onTextInput(const WindowEvents::WindowTextInput &textInputEvent)
+    inline virtual bool onKeyUp([[maybe_unused]] const WindowEvents::WindowKeyUp &keyUpEvent)
+    {
+        return false;
+    }
+
+    inline virtual bool onTextInput([[maybe_unused]] const WindowEvents::WindowTextInput &textInputEvent)
     {
         return false;
     }
@@ -63,7 +63,7 @@ class ApplicationSystem
     {
     }
 
-    virtual void onUpdate(const Timespan &deltaTime)
+    virtual void onUpdate([[maybe_unused]] const Timespan &deltaTime)
     {
     }
 

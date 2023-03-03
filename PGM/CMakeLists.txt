@@ -4,6 +4,11 @@ project(pgm)
 option (BUILD_SHARED_LIBS OFF)
 option (WITH_OPENGL "Enable OpenGL" ON)
 
+if (WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
+
 set (PGM_LOGGING_LEVEL 4)
 set (PGM_ASSERTS_ENABLED 
     $<$<CONFIG:DEBUG>: "PGM_ASSERTS_ENABLED" >)
@@ -41,7 +46,8 @@ set(
 
 # platform specific
 if (WIN32)
-  set(
+
+set(
     PLATFORM_SOURCES
 
     ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Input/Win32/Keyboard.cpp
@@ -51,6 +57,7 @@ if (WIN32)
 
     ${CMAKE_CURRENT_SOURCE_DIR}/Renderer/API/Backend/OpenGL/Win32/OpenGlRenderContext.cpp
 )
+
 endif()
 
 if(WITH_OPENGL)
