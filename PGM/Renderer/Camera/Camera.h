@@ -34,7 +34,7 @@ class Camera
   private:
     CameraType m_Type;
 
-    float m_Fov = 60.0f;
+    float m_Fov = 30.0f;
 
     float m_AspectRatio = 1.0f;
 

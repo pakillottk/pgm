@@ -245,65 +245,43 @@ bool GUISystem::onMouseMove(const WindowEvents::MouseMove &mouseMoveEvent)
 bool GUISystem::onMouseDown(const WindowEvents::MouseButtonDown &mouseDownEvent)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (!io.WantCaptureMouse)
-    {
-        return false;
-    }
-
     io.AddMouseButtonEvent(convertMouseButton(mouseDownEvent.button), true);
-    return true;
+    return io.WantCaptureMouse;
 }
 
 bool GUISystem::onMouseUp(const WindowEvents::MouseButtonUp &mouseUpEvent)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (!io.WantCaptureMouse)
-    {
-        return false;
-    }
-
     io.AddMouseButtonEvent(convertMouseButton(mouseUpEvent.button), false);
-    return true;
+
+    return io.WantCaptureMouse;
 }
 
 bool GUISystem::onKeyDown(const WindowEvents::WindowKeyDown &keyDownEvent)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (!io.WantCaptureKeyboard)
-    {
-        return false;
-    }
 
     if (!keyDownEvent.repeat)
     {
         io.AddKeyEvent(convertToImGuiKey(keyDownEvent.key), true);
+        return io.WantCaptureKeyboard;
     }
 
-    return true;
+    return false;
 }
 
 bool GUISystem::onKeyUp(const WindowEvents::WindowKeyUp &keyUpEvent)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (!io.WantCaptureKeyboard)
-    {
-        return false;
-    }
-
     io.AddKeyEvent(convertToImGuiKey(keyUpEvent.key), false);
-    return true;
+    return io.WantCaptureKeyboard;
 }
 
 bool GUISystem::onTextInput(const WindowEvents::WindowTextInput &textInputEvent)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (!io.WantTextInput)
-    {
-        return false;
-    }
-
     io.AddInputCharactersUTF8(textInputEvent.input.c_str());
-    return true;
+    return io.WantTextInput;
 }
 
 // Life cycle
@@ -317,16 +295,17 @@ void GUISystem::onActivate()
     auto &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
 
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
-    io.BackendFlags |=
-        ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
-    io.BackendFlags |=
-        ImGuiBackendFlags_PlatformHasViewports; // We can create multi-viewports on the Platform side (optional)
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can call io.AddMouseViewportEvent() with correct
-                                                                  // data (optional)
+    // io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    // io.BackendFlags |=
+    //     ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
+    // io.BackendFlags |=
+    //     ImGuiBackendFlags_PlatformHasViewports; // We can create multi-viewports on the Platform side (optional)
+    // io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can call io.AddMouseViewportEvent() with
+    // correct
+    //                                                               // data (optional)
 
-    ImGuiViewport *mainViewport = ImGui::GetMainViewport();
-    mainViewport->PlatformHandle = m_App.window().get();
+    // ImGuiViewport *mainViewport = ImGui::GetMainViewport();
+    // mainViewport->PlatformHandle = m_App.window().get();
 
     m_RenderData = GUI::initializeRenderData(m_App.renderer());
 
@@ -350,6 +329,7 @@ void GUISystem::beginFrame()
     io.DisplaySize.y = static_cast<float>(wnd->height());
 
     ImGui::NewFrame();
+    PGM::Logging::log_debug("io.MouseDown[0]={}", io.MouseDown[0]);
 
     ImGuizmo::BeginFrame();
     ImGuizmo::SetDrawlist(ImGui::GetForegroundDrawList());

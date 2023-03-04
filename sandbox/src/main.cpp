@@ -144,11 +144,20 @@ class SandboxSystem : public PGM::ApplicationSystem
         ImGuizmo::DrawGrid(glm::value_ptr(viewMat), glm::value_ptr(projMat), glm::value_ptr(PGM::Identity4x4), 100.f);
 
         auto trf = m_QuadTrf.toMatrix();
+        ImGuizmo::DrawCubes(glm::value_ptr(viewMat), glm::value_ptr(projMat), glm::value_ptr(trf), 1);
         ImGuizmo::Manipulate(glm::value_ptr(viewMat), glm::value_ptr(projMat), ImGuizmo::UNIVERSAL, ImGuizmo::LOCAL,
                              glm::value_ptr(trf));
         ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(trf), glm::value_ptr(m_QuadTrf.position),
                                               glm::value_ptr(m_QuadTrf.rotation), glm::value_ptr(m_QuadTrf.scale));
         m_QuadTrf.rotation = glm::radians(m_QuadTrf.rotation);
+
+        ImGuizmo::ViewManipulate(glm::value_ptr(viewMat), 10, ImVec2{m_App.window()->width() - 256.0f, 0.0f},
+                                 ImVec2{256, 256}, 0x0);
+
+        const auto editedViewMat = glm::inverse(viewMat);
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(editedViewMat), glm::value_ptr(m_CameraTrf.position),
+                                              glm::value_ptr(m_CameraTrf.rotation), glm::value_ptr(m_CameraTrf.scale));
+        m_CameraTrf.rotation = glm::radians(m_CameraTrf.rotation);
 
         if (ImGui::Begin("Camera"))
         {
@@ -186,7 +195,7 @@ class SandboxSystem : public PGM::ApplicationSystem
   private:
     PGM::Events::EventListener m_ResizeListener;
     PGM::Components::TransformComponent m_CameraTrf;
-    PGM::Camera m_Camera = PGM::Camera{PGM::Perspective};
+    PGM::Camera m_Camera;
     PGM::SharedRef<PGM::Shader> m_DummyShader;
     PGM::SharedRef<PGM::VertexArray> m_DummyGeom;
     PGM::Components::TransformComponent m_QuadTrf;
