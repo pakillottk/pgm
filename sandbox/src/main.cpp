@@ -141,7 +141,7 @@ class SandboxSystem : public PGM::ApplicationSystem
 
         ImGuizmo::SetID(0);
 
-        ImGuizmo::DrawGrid(glm::value_ptr(viewMat), glm::value_ptr(projMat), glm::value_ptr(PGM::Identity4x4), 100.f);
+        ImGuizmo::SetOrthographic(m_Camera.type() == PGM::CameraType::Orthographic);
 
         auto trf = m_QuadTrf.toMatrix();
         ImGuizmo::DrawCubes(glm::value_ptr(viewMat), glm::value_ptr(projMat), glm::value_ptr(trf), 1);
@@ -151,8 +151,8 @@ class SandboxSystem : public PGM::ApplicationSystem
                                               glm::value_ptr(m_QuadTrf.rotation), glm::value_ptr(m_QuadTrf.scale));
         m_QuadTrf.rotation = glm::radians(m_QuadTrf.rotation);
 
-        ImGuizmo::ViewManipulate(glm::value_ptr(viewMat), 10, ImVec2{m_App.window()->width() - 256.0f, 0.0f},
-                                 ImVec2{256, 256}, 0x0);
+        ImGuizmo::ViewManipulate(glm::value_ptr(viewMat), m_CameraTrf.position.length(),
+                                 ImVec2{m_App.window()->width() - 256.0f, 0.0f}, ImVec2{256, 256}, 0x0);
 
         const auto editedViewMat = glm::inverse(viewMat);
         ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(editedViewMat), glm::value_ptr(m_CameraTrf.position),
@@ -161,6 +161,37 @@ class SandboxSystem : public PGM::ApplicationSystem
 
         if (ImGui::Begin("Camera"))
         {
+            ImGui::Text("Projection");
+
+            bool isOrtho = m_Camera.type() == PGM::CameraType::Orthographic;
+
+            if (ImGui::Checkbox("Ortho", &isOrtho))
+            {
+                if (isOrtho)
+                {
+                    m_Camera.setOrtho(m_Camera.orthoSize(), m_Camera.near(), m_Camera.far());
+                }
+                else
+                {
+                    m_Camera.setPerspective(m_Camera.fov(), m_Camera.near(), m_Camera.far());
+                }
+            }
+
+            float camViewSize = isOrtho ? m_Camera.orthoSize() : m_Camera.fov();
+            if (ImGui::DragFloat(isOrtho ? "Size" : "FOV", &camViewSize, 0.1f))
+            {
+                if (isOrtho)
+                {
+                    m_Camera.setOrtho(camViewSize, m_Camera.near(), m_Camera.far());
+                }
+                else
+                {
+                    m_Camera.setPerspective(camViewSize, m_Camera.near(), m_Camera.far());
+                }
+            }
+
+            ImGui::Separator();
+
             ImGui::Text("Position");
             ImGui::DragFloat("Pos X", &m_CameraTrf.position.x, 0.1f);
             ImGui::DragFloat("Pos Y", &m_CameraTrf.position.y, 0.1f);
@@ -194,8 +225,10 @@ class SandboxSystem : public PGM::ApplicationSystem
 
   private:
     PGM::Events::EventListener m_ResizeListener;
+
+    PGM::Camera m_Camera{PGM::CameraType::Orthographic};
     PGM::Components::TransformComponent m_CameraTrf;
-    PGM::Camera m_Camera;
+
     PGM::SharedRef<PGM::Shader> m_DummyShader;
     PGM::SharedRef<PGM::VertexArray> m_DummyGeom;
     PGM::Components::TransformComponent m_QuadTrf;
