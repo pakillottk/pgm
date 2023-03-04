@@ -7,6 +7,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
+#include <imguizmo/ImGuizmo.h>
 
 class SandboxSystem : public PGM::ApplicationSystem
 {
@@ -20,16 +21,18 @@ class SandboxSystem : public PGM::ApplicationSystem
     // Life cycle
     void onActivate() override
     {
-        static constexpr const char *vertex_shader = "#version 430 core\n"
-                                                     "layout (location = 0) in vec3 in_Position;\n"
-                                                     "layout (location = 7) in vec4 in_Color;\n"
-                                                     "uniform mat4 u_ViewProjMat;\n"
-                                                     "out vec4 frag_Color;\n"
-                                                     "void main()\n"
-                                                     "{\n"
-                                                     "    frag_Color = in_Color;\n"
-                                                     "    gl_Position = u_ViewProjMat * vec4(in_Position.xy,0,1);\n"
-                                                     "}\n";
+        static constexpr const char *vertex_shader =
+            "#version 430 core\n"
+            "layout (location = 0) in vec3 in_Position;\n"
+            "layout (location = 7) in vec4 in_Color;\n"
+            "uniform mat4 u_ModelMat;\n"
+            "uniform mat4 u_ViewProjMat;\n"
+            "out vec4 frag_Color;\n"
+            "void main()\n"
+            "{\n"
+            "    frag_Color = in_Color;\n"
+            "    gl_Position = u_ViewProjMat * u_ModelMat * vec4(in_Position.xy,0,1);\n"
+            "}\n";
 
         static constexpr const char *fragment_shader = "#version 430 core\n"
                                                        "in vec4 frag_Color;\n"
@@ -41,7 +44,11 @@ class SandboxSystem : public PGM::ApplicationSystem
 
         m_DummyShader = m_App.renderer()->createShader(vertex_shader, fragment_shader);
 
-        int matLoc = m_DummyShader->getUniformLocation("u_ViewProjMat");
+        const int modelMatLoc = m_DummyShader->getUniformLocation("u_ModelMat");
+        PGM_ASSERT(modelMatLoc >= 0, "ModelMat uniform not found");
+        m_DummyShader->setUniform(modelMatLoc, m_QuadTrf);
+
+        const int matLoc = m_DummyShader->getUniformLocation("u_ViewProjMat");
         PGM_ASSERT(matLoc >= 0, "ViewProjMat uniform not found");
 
         m_CameraTrf.position.z = 5.0f;
@@ -101,11 +108,6 @@ class SandboxSystem : public PGM::ApplicationSystem
         m_App.renderer()->setViewport({0, 0, window->width(), window->height()});
         m_App.renderer()->setClipRegion({0, 0, window->width(), window->height()});
         m_App.renderer()->clear(PGM::bColor | PGM::bDepth, PGM::Color{0, 0, 0, 1});
-
-        const auto viewMat = glm::inverse(m_CameraTrf.toMatrix());
-        const auto &projMat = m_Camera.projection();
-        const int matLoc = m_DummyShader->getUniformLocation("u_ViewProjMat");
-        m_DummyShader->setUniform(matLoc, projMat * viewMat);
     }
 
     void endFrame() override
@@ -114,6 +116,16 @@ class SandboxSystem : public PGM::ApplicationSystem
 
     void onUpdate(const PGM::Timespan &deltaTime) override
     {
+        const auto viewMat = glm::inverse(m_CameraTrf.toMatrix());
+        const auto &projMat = m_Camera.projection();
+        const int matLoc = m_DummyShader->getUniformLocation("u_ViewProjMat");
+        PGM_ASSERT(matLoc >= 0, "ViewProjMat uniform not found");
+        m_DummyShader->setUniform(matLoc, projMat * viewMat);
+
+        const int modelMatLoc = m_DummyShader->getUniformLocation("u_ModelMat");
+        PGM_ASSERT(modelMatLoc >= 0, "ModelMat uniform not found");
+        m_DummyShader->setUniform(modelMatLoc, m_QuadTrf);
+
         m_DummyShader->bind();
 
         m_DummyGeom->bind();
@@ -124,6 +136,20 @@ class SandboxSystem : public PGM::ApplicationSystem
 
     void onGui(const PGM::Timespan &deltaTime) override
     {
+        const auto &projMat = m_Camera.projection();
+        auto viewMat = glm::inverse(m_CameraTrf.toMatrix());
+
+        ImGuizmo::SetID(0);
+
+        ImGuizmo::DrawGrid(glm::value_ptr(viewMat), glm::value_ptr(projMat), glm::value_ptr(PGM::Identity4x4), 100.f);
+
+        auto trf = m_QuadTrf.toMatrix();
+        ImGuizmo::Manipulate(glm::value_ptr(viewMat), glm::value_ptr(projMat), ImGuizmo::UNIVERSAL, ImGuizmo::LOCAL,
+                             glm::value_ptr(trf));
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(trf), glm::value_ptr(m_QuadTrf.position),
+                                              glm::value_ptr(m_QuadTrf.rotation), glm::value_ptr(m_QuadTrf.scale));
+        m_QuadTrf.rotation = glm::radians(m_QuadTrf.rotation);
+
         if (ImGui::Begin("Camera"))
         {
             ImGui::Text("Position");
@@ -160,9 +186,10 @@ class SandboxSystem : public PGM::ApplicationSystem
   private:
     PGM::Events::EventListener m_ResizeListener;
     PGM::Components::TransformComponent m_CameraTrf;
-    PGM::Camera m_Camera;
+    PGM::Camera m_Camera = PGM::Camera{PGM::Perspective};
     PGM::SharedRef<PGM::Shader> m_DummyShader;
     PGM::SharedRef<PGM::VertexArray> m_DummyGeom;
+    PGM::Components::TransformComponent m_QuadTrf;
 
     PGM::Scene m_Scene;
 };

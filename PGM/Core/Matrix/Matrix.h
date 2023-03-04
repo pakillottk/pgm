@@ -10,4 +10,6 @@ namespace PGM
 
 using Mat4 = glm::mat4;
 
+static constexpr Mat4 Identity4x4 = Mat4();
+
 } // namespace PGM

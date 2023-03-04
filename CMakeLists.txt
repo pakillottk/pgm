@@ -15,9 +15,10 @@ if (WIN32)
   add_compile_definitions(UNICODE)
 endif()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/vendor ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui) 
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 set(GLEW_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glew/include)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/PGM)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sandbox)

@@ -9,6 +9,10 @@
 #include <imgui/imgui_tables.cpp>
 #include <imgui/imgui_widgets.cpp>
 
+// Compile IMGUIZMO
+#include <imguizmo/ImGuizmo.cpp>
+#include <imguizmo/ImGuizmo.h>
+
 // Methods for std string
 #include <imgui/misc/cpp/imgui_stdlib.h>
 

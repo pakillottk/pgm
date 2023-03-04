@@ -5,6 +5,7 @@
 #include "../../Platform/Input/Mouse.h"
 
 #include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
 
 namespace PGM::GUI
 {
@@ -309,7 +310,8 @@ bool GUISystem::onTextInput(const WindowEvents::WindowTextInput &textInputEvent)
 void GUISystem::onActivate()
 {
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    auto ctx = ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(ctx);
 
     // TODO(pgm) These flags are not correct for all the platforms, but for now we only support win32...
     auto &io = ImGui::GetIO();
@@ -348,6 +350,10 @@ void GUISystem::beginFrame()
     io.DisplaySize.y = static_cast<float>(wnd->height());
 
     ImGui::NewFrame();
+
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetDrawlist(ImGui::GetForegroundDrawList());
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 }
 
 void GUISystem::endFrame()
