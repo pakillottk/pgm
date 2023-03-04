@@ -67,4 +67,5 @@ class EntityRef
 
     friend class Scene;
 };
+
 } // namespace PGM

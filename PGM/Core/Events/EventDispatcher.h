@@ -30,6 +30,17 @@ struct EventListener final
         }
     }
 
+    inline void unsuscribe()
+    {
+        if (m_UnsuscribeCallback)
+        {
+            m_UnsuscribeCallback();
+            m_UnsuscribeCallback = nullptr;
+        }
+    }
+
+    EventListener() = default;
+
     EventListener(EventListener &&) noexcept = default;
     EventListener &operator=(EventListener &&) = default;
 
@@ -55,7 +66,7 @@ class EventQueue
     template <typename EventType>
     inline EventListener suscribe(const std::function<void(const EventType &event)> &callback)
     {
-        std::scoped_lock<std::mutex> lk{m_Lock};
+        // std::scoped_lock<std::mutex> lk{m_Lock};
 
         const auto id = genId();
         auto callbackPtr = [callback](const void *event_ptr) {
@@ -77,7 +88,7 @@ class EventQueue
 
     template <typename EventType> inline void unsuscribe(listener_id id)
     {
-        std::scoped_lock<std::mutex> lk{m_Lock};
+        // std::scoped_lock<std::mutex> lk{m_Lock};
 
         // Find queue of event
         auto queueIt = m_Listeners.find(typeid(EventType).hash_code());

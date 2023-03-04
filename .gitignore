@@ -7,3 +7,5 @@ vendor/glew/bin
 vendor/glew/lib
 vendor/glew/tmp
 vendor/glew/out
+
+imgui.ini

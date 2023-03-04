@@ -67,6 +67,10 @@ class ApplicationSystem
     {
     }
 
+    virtual void onGui([[maybe_unused]] const Timespan &deltaTime)
+    {
+    }
+
   protected:
     Application &m_App;
 };

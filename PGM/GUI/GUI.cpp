@@ -145,6 +145,8 @@ RenderData initializeRenderData(const Renderer &ctx)
 
     ImGuiIO &io = ImGui::GetIO();
 
+    io.Fonts->AddFontFromFileTTF("fonts/Rubik-Regular.ttf", 16.0);
+
     // Build texture atlas
     unsigned char *pixels;
     int width, height;

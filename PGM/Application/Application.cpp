@@ -60,6 +60,11 @@ void Application::run()
 
         for (auto &system : m_SystemsStack)
         {
+            system->onGui(deltaTime);
+        }
+
+        for (auto &system : m_SystemsStack)
+        {
             system->endFrame();
         }
 
