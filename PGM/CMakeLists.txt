@@ -4,6 +4,9 @@ project(pgm)
 option (BUILD_SHARED_LIBS OFF)
 option (WITH_OPENGL "Enable OpenGL" ON)
 
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
 if (WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
@@ -12,9 +15,6 @@ endif()
 set (PGM_LOGGING_LEVEL 4)
 set (PGM_ASSERTS_ENABLED 
     $<$<CONFIG:DEBUG>: "PGM_ASSERTS_ENABLED" >)
-
-set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if (WIN32)
   # Non unicode windows api is broken...

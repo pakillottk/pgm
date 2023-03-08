@@ -18,6 +18,11 @@ class Scene
 
     void for_each(std::function<void(EntityRef)> callback);
 
+    template <typename Component, typename... Components> inline auto view()
+    {
+        return m_Registry.view<Component, Components...>();
+    }
+
   private:
     entt::registry m_Registry;
 
