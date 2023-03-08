@@ -12,7 +12,7 @@
 namespace PGM::OpenGL
 {
 
-static int createShader(const std::string_view &vertexSource, const std::string_view &fragmentSource)
+static int createShader(std::string_view vertexSource, std::string_view fragmentSource)
 {
     const int id = glCreateProgram();
 
@@ -84,7 +84,7 @@ static int createShader(const std::string_view &vertexSource, const std::string_
     return id;
 }
 
-OpenGlShader::OpenGlShader(const std::string_view &vertexSource, const std::string_view &fragmentSource)
+OpenGlShader::OpenGlShader(std::string_view vertexSource, std::string_view fragmentSource)
 {
     m_Id = createShader(vertexSource, fragmentSource);
     PGM_ASSERT(m_Id > 0, "Invalid shader program");
@@ -123,7 +123,7 @@ void OpenGlShader::unbind() const
     PGM_CHECK_GL();
 }
 
-int OpenGlShader::getUniformLocation(const std::string_view &id) const
+int OpenGlShader::getUniformLocation(std::string_view id) const
 {
     int loc = glGetUniformLocation(m_Id, id.data());
     PGM_CHECK_GL();

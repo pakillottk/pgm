@@ -12,7 +12,7 @@ namespace PGM::Logging
 {
 
 template <typename... Rest>
-inline void log_error([[maybe_unused]] const std::string_view &str, [[maybe_unused]] Rest &&...rest)
+inline void log_error([[maybe_unused]] std::string_view str, [[maybe_unused]] Rest &&...rest)
 {
 #if PGM_LOGGING_LEVEL > 0
     fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::red), "[ERROR] {}\n",
@@ -21,7 +21,7 @@ inline void log_error([[maybe_unused]] const std::string_view &str, [[maybe_unus
 }
 
 template <typename... Rest>
-inline void log_warning([[maybe_unused]] const std::string_view &str, [[maybe_unused]] Rest &&...rest)
+inline void log_warning([[maybe_unused]] std::string_view str, [[maybe_unused]] Rest &&...rest)
 {
 #if PGM_LOGGING_LEVEL > 1
     fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::yellow), "[WARNING] {}\n",
@@ -29,8 +29,7 @@ inline void log_warning([[maybe_unused]] const std::string_view &str, [[maybe_un
 #endif
 }
 
-template <typename... Rest>
-inline void log_info([[maybe_unused]] const std::string_view &str, [[maybe_unused]] Rest &&...rest)
+template <typename... Rest> inline void log_info([[maybe_unused]] std::string_view str, [[maybe_unused]] Rest &&...rest)
 {
 #if PGM_LOGGING_LEVEL > 2
     fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::cyan), "[INFO] {}\n",
@@ -39,7 +38,7 @@ inline void log_info([[maybe_unused]] const std::string_view &str, [[maybe_unuse
 }
 
 template <typename... Rest>
-inline void log_debug([[maybe_unused]] const std::string_view &str, [[maybe_unused]] Rest &&...rest)
+inline void log_debug([[maybe_unused]] std::string_view str, [[maybe_unused]] Rest &&...rest)
 {
 #if PGM_LOGGING_LEVEL > 3
     fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::magenta), "[DEBUG] {}\n",

@@ -22,7 +22,7 @@ class Window
         // TODO
     };
 
-    Window(const std::string_view &title, unsigned w = 800, unsigned h = 600, FLAGS flags = bDefault);
+    Window(std::string_view title, unsigned w = 800, unsigned h = 600, FLAGS flags = bDefault);
     ~Window();
 
     /// @brief Bottom left corner (as most graphics API coord system)

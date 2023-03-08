@@ -23,7 +23,7 @@ class Shader
     virtual void bind() const = 0;
     virtual void unbind() const = 0;
 
-    virtual int getUniformLocation(const std::string_view &id) const = 0;
+    virtual int getUniformLocation(std::string_view id) const = 0;
 
     virtual void setUniform(int loc, int value) const = 0;
 

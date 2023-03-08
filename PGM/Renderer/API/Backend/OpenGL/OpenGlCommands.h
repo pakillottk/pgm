@@ -21,8 +21,8 @@ struct OpenGlCommands : public RendererCommands
     SharedRef<VertexArray> createIndexedVertexArray(const VertexAttrib &indexAttribute,
                                                     std::initializer_list<VertexAttrib> attributes) const override;
 
-    SharedRef<Shader> createShader(const std::string_view &vertexSource,
-                                   const std::string_view &fragmentSource) const override;
+    SharedRef<Shader> createShader(std::string_view vertexSource,
+                                   std::string_view fragmentSource) const override;
 
     SharedRef<Texture2d> createTexture2d(PixelType pixelType, unsigned channelCount, unsigned w, unsigned h,
                                          const void *data = nullptr) const override;

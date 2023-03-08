@@ -115,8 +115,8 @@ SharedRef<VertexArray> OpenGlCommands::createIndexedVertexArray(const VertexAttr
     return make_shared_ref<OpenGL::VertexArrayImpl>(indexAttribute, attributes);
 }
 
-SharedRef<Shader> OpenGlCommands::createShader(const std::string_view &vertexSource,
-                                               const std::string_view &fragmentSource) const
+SharedRef<Shader> OpenGlCommands::createShader(std::string_view vertexSource,
+                                               std::string_view fragmentSource) const
 {
     return make_shared_ref<OpenGlShader>(vertexSource, fragmentSource);
 }

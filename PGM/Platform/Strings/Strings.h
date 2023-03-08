@@ -6,6 +6,6 @@
 namespace PGM::Strings
 {
 
-std::wstring widen_utf8(const std::string_view &utf8);
+std::wstring widen_utf8(std::string_view utf8);
 
 }

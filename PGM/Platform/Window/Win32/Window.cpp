@@ -384,7 +384,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     return Result;
 }
 
-internal Window::window_impl_t win32_create_window(const std::string_view &title, unsigned w, unsigned h,
+internal Window::window_impl_t win32_create_window(std::string_view title, unsigned w, unsigned h,
                                                    Window::FLAGS flags)
 {
     HINSTANCE hInstance = GetModuleHandleW(NULL);
@@ -417,7 +417,7 @@ internal Window::window_impl_t win32_create_window(const std::string_view &title
     return context;
 }
 
-Window::Window(const std::string_view &title, unsigned w /*= 800*/, unsigned h /*= 600*/, FLAGS flags /*= bDefault*/)
+Window::Window(std::string_view title, unsigned w /*= 800*/, unsigned h /*= 600*/, FLAGS flags /*= bDefault*/)
     : m_FullScreen{false}
 {
     auto ctx = win32_create_window(title, w, h, flags);

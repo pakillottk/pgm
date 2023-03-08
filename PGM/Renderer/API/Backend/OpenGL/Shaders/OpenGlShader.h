@@ -8,7 +8,7 @@ namespace PGM::OpenGL
 class OpenGlShader final : public Shader
 {
   public:
-    OpenGlShader(const std::string_view &vertexSource, const std::string_view &fragmentSource);
+    OpenGlShader(std::string_view vertexSource, std::string_view fragmentSource);
 
     inline virtual ~OpenGlShader()
     {
@@ -24,7 +24,7 @@ class OpenGlShader final : public Shader
     void bind() const override;
     void unbind() const override;
 
-    int getUniformLocation(const std::string_view &id) const override;
+    int getUniformLocation(std::string_view id) const override;
 
     void setUniform(int loc, int value) const override;
 

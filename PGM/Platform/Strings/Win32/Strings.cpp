@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-std::wstring PGM::Strings::widen_utf8(const std::string_view &utf8)
+std::wstring PGM::Strings::widen_utf8(std::string_view utf8)
 {
     if (utf8.empty())
     {
