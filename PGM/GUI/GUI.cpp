@@ -141,11 +141,12 @@ RenderData initializeRenderData(const Renderer &ctx)
     renderData.indices = ctx->createBuffer(true, 0);
     renderData.vao = ctx->createIndexedVertexArray(
         PGM::VertexAttrib{renderData.indices},
-        {PGM::VertexAttrib{renderData.vertices, POSITION_LOC, PGM::Float, 2, sizeof(ImDrawVert),
+        {PGM::VertexAttrib{renderData.vertices, POSITION_LOC, PGM::VertexAttribDataType::Float, 2, sizeof(ImDrawVert),
                            IM_OFFSETOF(ImDrawVert, pos)},
-         PGM::VertexAttrib{renderData.vertices, UV_LOC, PGM::Float, 2, sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, uv)},
-         PGM::VertexAttrib{renderData.vertices, COLOR_LOC, PGM::UnsignedByte, 4, sizeof(ImDrawVert),
-                           IM_OFFSETOF(ImDrawVert, col), true}});
+         PGM::VertexAttrib{renderData.vertices, UV_LOC, PGM::VertexAttribDataType::Float, 2, sizeof(ImDrawVert),
+                           IM_OFFSETOF(ImDrawVert, uv)},
+         PGM::VertexAttrib{renderData.vertices, COLOR_LOC, PGM::VertexAttribDataType::UnsignedByte, 4,
+                           sizeof(ImDrawVert), IM_OFFSETOF(ImDrawVert, col), true}});
 
     ImGuiIO &io = ImGui::GetIO();
 
@@ -340,7 +341,9 @@ void renderImGui(ImDrawData *draw_data, RenderData &renderData)
             auto tex = reinterpret_cast<Texture2d *>(texId);
             tex->bind(1);
 
-            api->drawIndexed(PGM::Triangles, pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? PGM::UnsignedShort : PGM::Uint,
+            api->drawIndexed(PGM::PrimitiveType::Triangles, pcmd->ElemCount,
+                             sizeof(ImDrawIdx) == 2 ? PGM::VertexAttribDataType::UnsignedShort
+                                                    : PGM::VertexAttribDataType::Uint,
                              (pcmd->IdxOffset * sizeof(ImDrawIdx)));
         }
 

@@ -81,7 +81,7 @@ target_link_libraries(
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PGM_ASSERTS_ENABLED} PGM_LOGGING_LEVEL=${PGM_LOGGING_LEVEL})
 target_include_directories(${PROJECT_NAME} PRIVATE ${BACKEND_INCLUDES})
 if(MSVC)
-  set(WARN_LEVEL "-W4" "/permissive-")
+  set(WARN_LEVEL "-W4" "/wd4201" "/permissive-")
 else()
   set(WARN_LEVEL "-Wall" "-Wextra" "-Wpedantic")
 endif()

@@ -115,8 +115,7 @@ SharedRef<VertexArray> OpenGlCommands::createIndexedVertexArray(const VertexAttr
     return make_shared_ref<OpenGL::VertexArrayImpl>(indexAttribute, attributes);
 }
 
-SharedRef<Shader> OpenGlCommands::createShader(std::string_view vertexSource,
-                                               std::string_view fragmentSource) const
+SharedRef<Shader> OpenGlCommands::createShader(std::string_view vertexSource, std::string_view fragmentSource) const
 {
     return make_shared_ref<OpenGlShader>(vertexSource, fragmentSource);
 }
@@ -131,7 +130,12 @@ static constexpr GLenum mapPrimitiveType(PrimitiveType primitive)
 {
     switch (primitive)
     {
-    case Triangles:
+    case PrimitiveType::Points:
+        return GL_POINTS;
+
+    case PrimitiveType::Lines:
+        return GL_LINES;
+    case PrimitiveType::Triangles:
         return GL_TRIANGLES;
 
     default:
@@ -144,22 +148,22 @@ static constexpr GLenum mapIndexType(VertexAttribDataType type)
 {
     switch (type)
     {
-    case Byte:
+    case VertexAttribDataType::Byte:
         return GL_BYTE;
 
-    case UnsignedByte:
+    case VertexAttribDataType::UnsignedByte:
         return GL_UNSIGNED_BYTE;
 
-    case Short:
+    case VertexAttribDataType::Short:
         return GL_SHORT;
 
-    case UnsignedShort:
+    case VertexAttribDataType::UnsignedShort:
         return GL_UNSIGNED_SHORT;
 
-    case Int:
+    case VertexAttribDataType::Int:
         return GL_INT;
 
-    case Uint:
+    case VertexAttribDataType::Uint:
         return GL_UNSIGNED_INT;
 
     default:

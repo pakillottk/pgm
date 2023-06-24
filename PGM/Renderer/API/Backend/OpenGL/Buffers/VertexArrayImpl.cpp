@@ -33,25 +33,25 @@ namespace detail
     {
         switch (dt)
         {
-        case PGM::Byte:
+        case PGM::VertexAttribDataType::Byte:
             return GL_BYTE;
 
-        case PGM::UnsignedByte:
+        case PGM::VertexAttribDataType::UnsignedByte:
             return GL_UNSIGNED_BYTE;
 
-        case PGM::Short:
+        case PGM::VertexAttribDataType::Short:
             return GL_SHORT;
 
-        case PGM::UnsignedShort:
+        case PGM::VertexAttribDataType::UnsignedShort:
             return GL_UNSIGNED_SHORT;
 
-        case PGM::Int:
+        case PGM::VertexAttribDataType::Int:
             return GL_INT;
 
-        case PGM::Uint:
+        case PGM::VertexAttribDataType::Uint:
             return GL_UNSIGNED_INT;
 
-        case PGM::Float:
+        case PGM::VertexAttribDataType::Float:
             return GL_FLOAT;
 
         default:
@@ -71,12 +71,13 @@ namespace detail
         {
             glBindBuffer(GL_ARRAY_BUFFER, attrib.buffer->id());
 
-            glVertexAttribPointer(attrib.location, static_cast<GLint>(attrib.size), convertDataType(attrib.type),
-                                  attrib.normalize ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(attrib.stride),
-                                  reinterpret_cast<void *>(attrib.offset));
+            glVertexAttribPointer(attrib.layout.location, static_cast<GLint>(attrib.layout.size),
+                                  convertDataType(attrib.layout.type), attrib.layout.normalize ? GL_TRUE : GL_FALSE,
+                                  static_cast<GLsizei>(attrib.layout.stride),
+                                  reinterpret_cast<void *>(attrib.layout.offset));
             PGM_CHECK_GL();
 
-            glEnableVertexArrayAttrib(id, attrib.location);
+            glEnableVertexArrayAttrib(id, attrib.layout.location);
             PGM_CHECK_GL();
         }
     }

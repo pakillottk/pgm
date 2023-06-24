@@ -59,33 +59,29 @@ class SandboxSystem : public PGM::ApplicationSystem
         m_DummyShader->setUniform(matLoc, projMat * viewMat);
 
         // clang-format off
-        const float vertices[] = 
+        struct QuadVertex
         {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f,
-
-            1.0f, -1.0f, 0.0f,
-            1.0f,  1.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f
+            PGM::Vec3 position;
+            PGM::ByteColor color;
         };
-        const PGM::ByteColor colors[] = 
+        const QuadVertex vertices[] = 
         {
-            PGM::Colors::toByteColor(PGM::Colors::Red),
-            PGM::Colors::toByteColor(PGM::Colors::Green),
-            PGM::Colors::toByteColor(PGM::Colors::Blue),
+            {{-1.0f, -1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Red)},
+            {{1.0f, -1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Green)},
+            {{-1.0f,  1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Blue)},
 
-            PGM::Colors::toByteColor(PGM::Colors::Yellow),
-            PGM::Colors::toByteColor(PGM::Colors::Magenta),
-            PGM::Colors::toByteColor(PGM::Colors::Cyan)
+            {{1.0f, -1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Yellow)},
+            {{1.0f,  1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Magenta)},
+            {{-1.0f, 1.0f, 0.0f}, PGM::Colors::toByteColor(PGM::Colors::Cyan)}
+        };
+        const PGM::BatchLayout layout = {
+            PGM::VertexAttribLayout{PGM::Position, PGM::VertexAttribDataType::Float, 3, sizeof(QuadVertex), 0},
+            PGM::VertexAttribLayout{PGM::VertexColor, PGM::VertexAttribDataType::UnsignedByte, 4, sizeof(QuadVertex), offsetof(QuadVertex, color), true}
         };
         // clang-format on
 
-        auto vertexBuff = m_App.renderer()->createBuffer(false, sizeof(vertices), vertices);
-        auto colorBuff = m_App.renderer()->createBuffer(false, sizeof(colors), colors);
-        m_DummyGeom = m_App.renderer()->createVertexArray(
-            {PGM::VertexAttrib{vertexBuff, PGM::Position, PGM::Float, 3, 0, 0},
-             PGM::VertexAttrib{colorBuff, PGM::VertexColor, PGM::UnsignedByte, 4, 0, 0, true}});
+        m_QuadBatch = PGM::make_shared_ref<PGM::StaticBatch>(m_App.renderer().context(), PGM::PrimitiveType::Triangles,
+                                                             layout, 6 * sizeof(QuadVertex), vertices);
 
         m_ResizeListener = m_App.window()->dispatcher()->suscribe<PGM::WindowEvents::WindowResized>(
             [this](const PGM::WindowEvents::WindowResized &event) {
@@ -96,8 +92,6 @@ class SandboxSystem : public PGM::ApplicationSystem
     void onDeactivate() override
     {
         m_ResizeListener.unsuscribe();
-
-        m_DummyGeom->destroy();
         m_DummyShader->destroy();
     }
 
@@ -108,14 +102,9 @@ class SandboxSystem : public PGM::ApplicationSystem
         m_App.renderer()->setViewport({0, 0, window->width(), window->height()});
         m_App.renderer()->setClipRegion({0, 0, window->width(), window->height()});
         m_App.renderer()->clear(PGM::bColor | PGM::bDepth, PGM::Color{0, 0, 0, 1});
-    }
 
-    void endFrame() override
-    {
-    }
+        m_DummyShader->bind();
 
-    void onUpdate(const PGM::Timespan &deltaTime) override
-    {
         const auto viewMat = glm::inverse(m_CameraTrf.toMatrix());
         const auto &projMat = m_Camera.projection();
         const int matLoc = m_DummyShader->getUniformLocation("u_ViewProjMat");
@@ -126,12 +115,17 @@ class SandboxSystem : public PGM::ApplicationSystem
         PGM_ASSERT(modelMatLoc >= 0, "ModelMat uniform not found");
         m_DummyShader->setUniform(modelMatLoc, m_QuadTrf);
 
-        m_DummyShader->bind();
-
-        m_DummyGeom->bind();
-        m_App.renderer()->draw(PGM::Triangles, 6, 0);
-
         m_DummyShader->unbind();
+
+        m_App.renderer().submitBatch(m_DummyShader, m_QuadBatch);
+    }
+
+    void endFrame() override
+    {
+    }
+
+    void onUpdate(const PGM::Timespan &deltaTime) override
+    {
     }
 
     void onGui(const PGM::Timespan &deltaTime) override
@@ -230,7 +224,7 @@ class SandboxSystem : public PGM::ApplicationSystem
     PGM::Components::TransformComponent m_CameraTrf;
 
     PGM::SharedRef<PGM::Shader> m_DummyShader;
-    PGM::SharedRef<PGM::VertexArray> m_DummyGeom;
+    PGM::SharedRef<PGM::StaticBatch> m_QuadBatch;
     PGM::Components::TransformComponent m_QuadTrf;
 
     PGM::Scene m_Scene;

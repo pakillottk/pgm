@@ -31,7 +31,7 @@ enum AttribLocations : unsigned
     VertexColor = 7
 };
 
-enum VertexAttribDataType
+enum class VertexAttribDataType
 {
     Byte,
     UnsignedByte,
@@ -42,15 +42,20 @@ enum VertexAttribDataType
     Float
 };
 
-struct VertexAttrib
+struct VertexAttribLayout
 {
-    SharedRef<GpuBuffer> buffer;
     unsigned location;
     VertexAttribDataType type;
     unsigned size;
     size_t stride;
     size_t offset;
     bool normalize = false;
+};
+
+struct VertexAttrib
+{
+    SharedRef<GpuBuffer> buffer;
+    VertexAttribLayout layout;
 };
 
 static constexpr int NULL_VERTEX_ARRAY_ID = -1;

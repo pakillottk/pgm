@@ -19,8 +19,10 @@ enum ClearBufferBits
     bStencil = 0b100
 };
 
-enum PrimitiveType
+enum class PrimitiveType
 {
+    Points,
+    Lines,
     Triangles
 };
 
@@ -42,8 +44,7 @@ struct RendererCommands
                                                             std::initializer_list<VertexAttrib> attributes) const = 0;
 
     // TODO(pgm) This is not crossplatform but for now will suffice...
-    virtual SharedRef<Shader> createShader(std::string_view vertexSource,
-                                           std::string_view fragmentSource) const = 0;
+    virtual SharedRef<Shader> createShader(std::string_view vertexSource, std::string_view fragmentSource) const = 0;
 
     virtual SharedRef<Texture2d> createTexture2d(PixelType pixelType, unsigned channelCount, unsigned w, unsigned h,
                                                  const void *data = nullptr) const = 0;

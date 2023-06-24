@@ -68,8 +68,9 @@ void Application::run()
             system->endFrame();
         }
 
-        m_GUI.endFrame();
+        m_Renderer.renderFrame();
 
+        m_GUI.endFrame();
         m_Renderer.end();
     }
 }
